@@ -1,3 +1,6 @@
 extends index
 block content
-	h2 hey there bud!
+	form(action="/room", method="post")
+		label roomId
+		input(name="roomId",type="text")
+		input(type="submit")
