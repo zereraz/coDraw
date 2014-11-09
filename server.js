@@ -6,6 +6,8 @@
 
 var express = require('express');
 var app = express();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
 
 //middleware
 var bodyParser = require('body-parser');
@@ -58,12 +60,24 @@ app.get('/',index.root);
 app.post('/room',room.postRoom);
 
 
+
+/*==========================
+ *
+ *	SOCKET.IO	
+ *
+==========================*/
+
+io.on('connection', function(socket){
+	console.log('a user connected');
+});
+
+
 /*==========================
  *
  *	LISTENING ON PORT 3000
  *
 ==========================*/
-app.listen(port, function(){
+http.listen(port, function(){
 
 	console.log("listening on port "+port);
 });
