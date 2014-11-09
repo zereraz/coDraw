@@ -1,0 +1,24 @@
+{
+  "name": "coDraw",
+  "version": "0.0.1",
+  "description": "Multiple people drawing together",
+  "main": "server.js",
+  "private":true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/raunaqrox/coDraw"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/raunaqrox/coDraw/issues"
+  },
+  "homepage": "https://github.com/raunaqrox/coDraw",
+  "dependencies": {
+    "express": "^4.10.1"
+  }
+}
