@@ -1,3 +1,22 @@
 extends index
-block content
-	canvas(id="canvas", width="500", height="500")
+block content 
+    div(id="options")
+            h2(id="ctrl") Control Panel
+            h3 background-color
+            div(id="bg")
+                input(id="bColorInp")
+               
+            hr
+            h3 pen
+            div(id="penSz")
+                h3(id="pSize") 5
+                button(id="inc") +
+                button(id="dec") -
+            br
+            br
+            div(id="penColor")
+                div(id="pColor") 
+                p #
+                    input(id="pColorInp") 
+
+    canvas(id="canvas", width="500", height="500")

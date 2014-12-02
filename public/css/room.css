@@ -1,0 +1,65 @@
+body{
+    padding:0px;
+    margin:10px;
+    background:#123;
+}
+
+canvas{
+    position:absolute;
+    top:50px;
+    right:10px;
+    float:right;
+    display:inline;
+    border:1px dotted white;
+}
+/*============
+ *
+ *
+ * Control Panel
+ *
+ *
+ * ===========*/
+
+#ctrl{
+    text-align:center;
+}
+/*
+    //
+    // Background Options
+    //
+*/
+#bg{
+    float:right;
+}
+/*
+    //
+    // Pen Options
+    //
+*/
+#penSz{
+    float:right;
+}
+#penColor{
+    float:right;
+}
+#pColor{
+    width:5px;
+    height:5px;
+    background-color:black;
+}
+#options{
+    color:#bbb;
+    width:40%;
+    padding:40px 10px;
+    background:#123456;
+    height:200px;
+    position:absolute;
+    top:50px;
+}
+#options button{
+    margin:5px;
+}
+#options h3{
+    display:inline;
+    margin:10px;
+}

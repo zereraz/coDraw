@@ -12,13 +12,14 @@ $('document').ready(function(){
 	var prevY;
 	var mouseClick = false;
 	var moving = false;
-
-	//
+    var penSize = parseInt($('#pSize').text());
+	var penColor = "#000000";
+    //
 	// Mouse on events
 	//
 
 	function onMouseDown(e){
-		findxy(e);
+        findxy(e); 
 		drawStroke();
 		mouseClick = true;
 		
@@ -53,7 +54,7 @@ $('document').ready(function(){
 		canvas.addEventListener('mouseup', onMouseUp);
 		canvas.addEventListener('mousemove', onMouseMove);
 		canvas.addEventListener('mouseout', onMouseOut);
-	}
+    }
 
 	//
 	// Drawing functions
@@ -73,20 +74,48 @@ $('document').ready(function(){
 	function drawStroke(){
 		if(!moving){
 			ctx.beginPath();
-			ctx.fillRect(currentX, currentY, 1,1);
+			ctx.fillRect(currentX, currentY, penSize,penSize);
 			ctx.closePath();
 		}else{
 			ctx.beginPath();
 			ctx.moveTo(prevX, prevY);
 			ctx.lineTo(currentX,currentY);
-			ctx.lineWidth = 5;
+			ctx.lineWidth = penSize;
 			ctx.stroke();
 			ctx.closePath();
 		}
 	}
+//
+// Events
+//
+    
+   
+    $('#inc').on('click', incPenSize);
+    $('#dec').on('click', decPenSize);
+    $('#pColorInp').on('input', penColorChange);
+//
+// Event Handlers
+//
+    function incPenSize(){
+        penSize +=1;
+        $('#pSize').text(penSize);
+        $('#pColor').css({width:penSize,height:penSize});
+    }
+
+    function decPenSize(){
+        penSize -=1;
+        $('#pSize').text(penSize);
+        $('#pColor').css({width:penSize,height:penSize});
+    }
+    function penColorChange(){
+       var penColor = "#"+$('#pColorInp').val();
+       $('#pColor').css({background:penColor});
+       ctx.strokeStyle = penColor;
+       ctx.fillStyle = penColor;
+    }
+    init();
 
 
-	init();
 });
 
 
