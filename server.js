@@ -17,7 +17,7 @@ var port = 3000;
 //routes
 var index = require('./routes/index');
 var room = require('./routes/room');
-
+var activeConnections = 0;
 
 /*==========================
  *
@@ -57,7 +57,8 @@ app.set('views',__dirname+'/views');
 app.get('/',index.root);
 
 //room
-app.post('/room',room.postRoom);
+app.get('/room', room.getRoom);
+app.post('/room', room.postRoom);
 
 
 
@@ -68,9 +69,23 @@ app.post('/room',room.postRoom);
 ==========================*/
 
 io.on('connection', function(socket){
-	console.log('a user connected');
-});
 
+	activeConnections++;
+	io.sockets.emit('userConnect', activeConnections);
+	socket.on('disconnect', function(){
+		activeConnections--;
+		io.sockets.emit('userDisconnet', activeConnections);
+	});
+
+	socket.on('drawProgress', function(uid, co-ordinates){
+		io.sockets.emit('drawProgress', uid, co-ordinates);
+	});
+
+	socket.on('drawEnd', function(uid, co-ordinates){
+		io.sockets.emit('drawEnd', uid, co-ordinates);
+	});
+
+});
 
 /*==========================
  *
