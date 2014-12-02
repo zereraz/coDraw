@@ -13,7 +13,7 @@ var io = require('socket.io')(http);
 var bodyParser = require('body-parser');
 var session = require('express-session');  
 
-var port = 3000;
+var port = process.env.PORT || 3000;
 //routes
 var index = require('./routes/index');
 var room = require('./routes/room');
@@ -64,25 +64,25 @@ app.post('/room', room.postRoom);
 
 /*==========================
  *
- *	SOCKET.IO	
+ *	socket.io	
  *
 ==========================*/
 
 io.on('connection', function(socket){
 
-	activeConnections++;
-	io.sockets.emit('userConnect', activeConnections);
+	activeconnections++;
+	io.sockets.emit('userconnect', activeconnections);
 	socket.on('disconnect', function(){
-		activeConnections--;
-		io.sockets.emit('userDisconnet', activeConnections);
+		activeconnections--;
+		io.sockets.emit('userdisconnet', activeconnections);
 	});
 
-	socket.on('drawProgress', function(uid, co-ordinates){
-		io.sockets.emit('drawProgress', uid, co-ordinates);
+	socket.on('drawprogress', function(uid, co_ordinates){
+		io.sockets.emit('drawprogress', uid, co_ordinates);
 	});
 
-	socket.on('drawEnd', function(uid, co-ordinates){
-		io.sockets.emit('drawEnd', uid, co-ordinates);
+	socket.on('drawend', function(uid, co_ordinates){
+		io.sockets.emit('drawend', uid, co_ordinates);
 	});
 
 });
