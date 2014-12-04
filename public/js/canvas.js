@@ -13,7 +13,7 @@ $('document').ready(function(){
 	var moving = false;
     var penSize = parseInt($('#pSize').text());
 	var penColor = "#000000";
-
+    var socket = io();
     //
 	// Mouse on events
 	//
@@ -76,6 +76,7 @@ $('document').ready(function(){
 			ctx.beginPath();
 			ctx.fillRect(currentX, currentY, penSize,penSize);
 			ctx.closePath();
+            socket.emit('justClick',{"x":currentX,"y":currentY,"penSize":penSize,"penColor":penColor});
 		}else{
 			ctx.beginPath();
 			ctx.moveTo(prevX, prevY);

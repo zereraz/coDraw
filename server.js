@@ -80,7 +80,9 @@ io.on('connection', function(socket){
 	socket.on('drawprogress', function(uid, co_ordinates){
 		io.sockets.emit('drawprogress', uid, co_ordinates);
 	});
-
+    socket.on('justClick',function(clickData){
+        console.log(clickData);
+    });
 	socket.on('drawend', function(uid, co_ordinates){
 		io.sockets.emit('drawend', uid, co_ordinates);
 	});
