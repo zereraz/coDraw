@@ -7,7 +7,8 @@
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
-var io = require('socket.io')(http,{'transports':['websocket','polling']});
+var io = require('socket.io')(http,{transport:['websocket','polling']});
+
 
 //middleware
 var bodyParser = require('body-parser');
@@ -71,6 +72,11 @@ app.post('/room', room.postRoom);
 io.on('connection', function(socket){
     io.sockets.emit('hello','Hello Shetty!');
 	activeConnections++;
+    
+    socket.on('justClick',function(clickData){
+        console.log(clickData);
+    });
+    /*
 	io.sockets.emit('userconnect', activeConnections);
 	socket.on('disconnect', function(){
 		activeConnections--;
@@ -80,13 +86,10 @@ io.on('connection', function(socket){
 	socket.on('drawprogress', function(uid, co_ordinates){
 		io.sockets.emit('drawprogress', uid, co_ordinates);
 	});
-    socket.on('justClick',function(clickData){
-        console.log(clickData);
-    });
 	socket.on('drawend', function(uid, co_ordinates){
 		io.sockets.emit('drawend', uid, co_ordinates);
 	});
-
+*/
 });
 
 /*==========================
