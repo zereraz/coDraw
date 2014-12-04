@@ -69,12 +69,12 @@ app.post('/room', room.postRoom);
 ==========================*/
 
 io.on('connection', function(socket){
-
-	activeconnections++;
-	io.sockets.emit('userconnect', activeconnections);
+    io.sockets.emit('hello','Hello Shetty!');
+	activeConnections++;
+	io.sockets.emit('userconnect', activeConnections);
 	socket.on('disconnect', function(){
-		activeconnections--;
-		io.sockets.emit('userdisconnet', activeconnections);
+		activeConnections--;
+		io.sockets.emit('userdisconnet', activeConnections);
 	});
 
 	socket.on('drawprogress', function(uid, co_ordinates){

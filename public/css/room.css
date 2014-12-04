@@ -3,7 +3,10 @@ body{
     margin:10px;
     background:#123;
 }
-
+label{
+    color:#bbb;
+    margin:10px;
+}
 canvas{
     position:absolute;
     top:50px;
@@ -41,10 +44,13 @@ canvas{
 }
 #penColor{
     float:right;
+    overflow:scroll;
 }
 #pColor{
     width:5px;
     height:5px;
+    margin:0 auto;
+    display:inline-block;
     background-color:black;
 }
 #options{
@@ -55,6 +61,7 @@ canvas{
     height:200px;
     position:absolute;
     top:50px;
+    overflow:scroll;
 }
 #options button{
     margin:5px;

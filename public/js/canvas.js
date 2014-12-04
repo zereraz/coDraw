@@ -1,4 +1,3 @@
-
 $('document').ready(function(){
 
 
@@ -14,6 +13,7 @@ $('document').ready(function(){
 	var moving = false;
     var penSize = parseInt($('#pSize').text());
 	var penColor = "#000000";
+
     //
 	// Mouse on events
 	//
@@ -85,17 +85,20 @@ $('document').ready(function(){
 			ctx.closePath();
 		}
 	}
-//
-// Events
-//
+
+    //
+    // Events
+    //
     
    
     $('#inc').on('click', incPenSize);
     $('#dec').on('click', decPenSize);
     $('#pColorInp').on('input', penColorChange);
-//
-// Event Handlers
-//
+
+    //
+    // Event Handlers
+    //
+    
     function incPenSize(){
         penSize +=1;
         $('#pSize').text(penSize);
@@ -107,12 +110,14 @@ $('document').ready(function(){
         $('#pSize').text(penSize);
         $('#pColor').css({width:penSize,height:penSize});
     }
+
     function penColorChange(){
-       var penColor = "#"+$('#pColorInp').val();
-       $('#pColor').css({background:penColor});
-       ctx.strokeStyle = penColor;
-       ctx.fillStyle = penColor;
+        var penColor = "#"+$('#pColorInp').val();
+        $('#pColor').css({background:penColor});
+        ctx.strokeStyle = penColor;
+        ctx.fillStyle = penColor;
     }
+
     init();
 
 
