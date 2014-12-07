@@ -188,7 +188,7 @@ $('document').ready(function(){
         ctx.strokeStyle = color;
     }
     function penColorChange(){
-       
+        pen();
         $('#pColor').css({background:penColor});
         colorChange(penColor);
     }
