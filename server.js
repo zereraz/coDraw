@@ -61,7 +61,10 @@ app.get('/',index.root);
 app.get('/room', room.getRoom);
 app.post('/room', room.postRoom);
 
-
+//port
+app.get('/port',function(req,res){
+    res.send("port is "+port); 
+});
 
 /*==========================
  *
@@ -87,7 +90,6 @@ io.on('connection', function(socket){
 		activeConnections--;
 		io.sockets.emit('userdisconnet', activeConnections);
 	});
-
 	socket.on('drawprogress', function(uid, co_ordinates){
 		io.sockets.emit('drawprogress', uid, co_ordinates);
 	});
