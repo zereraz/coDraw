@@ -199,6 +199,7 @@ $('document').ready(function(){
     //
     
     socket.on('drawClick', function(data){
+        console.log("click "+ data);
         colorChange(data.penColor);
         drawClick(data.x,data.y,data.penSize);
         pen(); 
@@ -207,6 +208,7 @@ $('document').ready(function(){
 
     socket.on('drawDrag',function(data){ 
         colorChange(data.penColor);
+        console.log("click "+ data);
         drawDrag(data.prevX,data.prevY,data.currX,data.currY,data.penSize);        
         pen();
         colorChange(penColor);
