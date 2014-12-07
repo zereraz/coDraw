@@ -79,7 +79,7 @@ io.on('connection', function(socket){
     });
 
     socket.on('dragDraw',function(dragData){
-        //console.log(dragData);
+        io.sockets.emit('drawDrag',dragData); 
     });
     /*
 	io.sockets.emit('userconnect', activeConnections);
