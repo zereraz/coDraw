@@ -69,7 +69,8 @@ $('document').ready(function(){
 	//
 
 	function findxy(e){
-		if(mouseClick){
+	    $('canvas').css({'cursor':'crosshair'});
+        if(mouseClick){
 			prevX = currentX;
 			prevY = currentY;
 		}else{

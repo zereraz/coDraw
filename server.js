@@ -55,8 +55,10 @@ app.set('views',__dirname+'/views');
 ==========================*/
 
 //root
-app.get('/',index.root);
-
+//app.get('/',index.root);
+app.get('/', function(req,res){
+    res.render('canvas');
+});
 //room
 app.get('/room', room.getRoom);
 app.post('/room', room.postRoom);
