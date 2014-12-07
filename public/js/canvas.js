@@ -161,7 +161,7 @@ $('document').ready(function(){
     function penColorChange(){
         penColor = "#"+$('#pColorInp').val();
         $('#pColor').css({background:penColor});
-        clickColor(penColor); 
+        colorChange(penColor);
     }
 
     init();
@@ -176,11 +176,10 @@ $('document').ready(function(){
         colorChange(penColor);
     });
     socket.on('drawDrag',function(data){ 
-
         colorChange(data.penColor);
         drawDrag(data.prevX,data.prevY,data.currX,data.currY,data.penSize);        
-        console.log(data.prevX); 
         penColor = "#"+$('#pColorInp').val();
+        console.log("penColor "+penColor+" data pencolor "+data.penColor);
         colorChange(penColor);
     });
 
