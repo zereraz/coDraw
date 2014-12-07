@@ -71,10 +71,15 @@ app.post('/room', room.postRoom);
 
 io.on('connection', function(socket){
     io.sockets.emit('hello','Hello Shetty!');
+    io.sockets.emit('roomPopulation',activeConnections);
 	activeConnections++;
     
     socket.on('justClick',function(clickData){
-        console.log(clickData);
+        io.sockets.emit('drawClick',clickData); 
+    });
+
+    socket.on('dragDraw',function(dragData){
+        //console.log(dragData);
     });
     /*
 	io.sockets.emit('userconnect', activeConnections);

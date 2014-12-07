@@ -1,6 +1,5 @@
 $('document').ready(function(){
 
-
 	var canvas;
 	var ctx;
 	var width;
@@ -14,6 +13,13 @@ $('document').ready(function(){
     var penSize = parseInt($('#pSize').text());
 	var penColor = "#000000";
     var socket = io();
+    //
+    // Timers
+    //
+    // prevT, currT
+    //
+    var prevT;
+    var currT; 
     //
 	// Mouse on events
 	//
@@ -46,7 +52,8 @@ $('document').ready(function(){
 	}
 
 	function init(){
-		canvas = document.getElementById('canvas'); 
+
+        canvas = document.getElementById('canvas'); 
 		ctx = canvas.getContext('2d');
 		width = canvas.width;
 		height = canvas.height;
@@ -54,9 +61,10 @@ $('document').ready(function(){
 		canvas.addEventListener('mouseup', onMouseUp);
 		canvas.addEventListener('mousemove', onMouseMove);
 		canvas.addEventListener('mouseout', onMouseOut);
+    
     }
 
-	//
+    //
 	// Drawing functions
 	//
 
@@ -71,28 +79,61 @@ $('document').ready(function(){
 		currentX = e.offsetX;
 		currentY = e.offsetY;	
 	}
-	function drawStroke(){
-		if(!moving){
-			ctx.beginPath();
+    function drawClick(currentX, currentY, penSize){
+        if(!moving){
+            ctx.beginPath();
 			ctx.fillRect(currentX, currentY, penSize,penSize);
 			ctx.closePath();
-            socket.emit('justClick',{"x":currentX,"y":currentY,"penSize":penSize,"penColor":penColor});
+        }
+    }
+    function drawStroke(){
+		if(!moving){
+            drawClick(currentX,currentY,penSize);
+            justClickEmit();
 		}else{
-			ctx.beginPath();
+            ctx.beginPath();
 			ctx.moveTo(prevX, prevY);
 			ctx.lineTo(currentX,currentY);
 			ctx.lineWidth = penSize;
 			ctx.stroke();
 			ctx.closePath();
-		}
+            dragDrawEmit();
+        }
 	}
+
+    //
+    // Sockets Emit Data to server
+    //
+
+	function dragDrawEmit(){
+        var dragData = {
+                'prevX':prevX,
+                'prevY':prevY,
+                'currX':currentX,
+                'currY':currentY,
+                'penColor':penColor,
+                'penSize':penSize
+        };
+        socket.emit('dragDraw',dragData);
+    }
+
+    function justClickEmit(){
+        var clickData = {
+                "x":currentX,
+                "y":currentY,
+                "penSize":penSize,
+                "penColor":penColor
+        };
+        socket.emit('justClick',  clickData);
+    }
 
     //
     // Events
     //
     
    
-    $('#inc').on('click', incPenSize);
+    $('#inc')
+        .on('click', incPenSize);
     $('#dec').on('click', decPenSize);
     $('#pColorInp').on('input', penColorChange);
 
@@ -111,17 +152,29 @@ $('document').ready(function(){
         $('#pSize').text(penSize);
         $('#pColor').css({width:penSize,height:penSize});
     }
-
+    function clickColor(color){
+        ctx.fillStyle = color;
+        ctx.strokeStyle = color;
+    }
     function penColorChange(){
-        var penColor = "#"+$('#pColorInp').val();
+        penColor = "#"+$('#pColorInp').val();
         $('#pColor').css({background:penColor});
-        ctx.strokeStyle = penColor;
-        ctx.fillStyle = penColor;
+        clickColor(penColor); 
     }
 
     init();
+    //
+    // socket events
+    //
+    
+    socket.on('drawClick', function(data){
+        clickColor(data.penColor);
+        drawClick(data.x,data.y,data.penSize);
+        penColor = "#"+$('#pColorInp').val();
+        clickColor(penColor);
+    });
+
 
 
 });
-
 
