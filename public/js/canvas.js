@@ -13,6 +13,7 @@ $('document').ready(function(){
     var penSize = parseInt($('#pSize').text());
 	var penColor = "#000000";
     var socket = io();
+    var eraser = false;
     //
     // Timers
     //
@@ -81,8 +82,9 @@ $('document').ready(function(){
 		currentY = e.offsetY;	
 	}
     function drawClick(currentX, currentY, penSize){
+            
             ctx.beginPath();
-			ctx.fillRect(currentX, currentY, penSize,penSize);
+			ctx.fillRect(currentX-penSize/2, currentY-penSize/2, penSize,penSize);
 			ctx.closePath();
       
     }
@@ -103,29 +105,55 @@ $('document').ready(function(){
             dragDrawEmit();
         }
 	}
-
+    function eraserOn(){
+        eraser = true;
+        penColor = "#123";
+    }
+    function eraserOff(){
+        eraser = false;
+        pen();
+    }
+    
+    function pen(){
+        if(!eraser)
+             penColor = "#"+$('#pColorInp').val();
+        if(penColor.length<=1){
+            penColor = "#000000";
+        }
+    }
     //
     // Sockets Emit Data to server
     //
+    function checkType(){
 
+        if(eraser){
+            return 'e'; 
+        }else{
+            return 'p';
+        }
+    }
 	function dragDrawEmit(){
+        var type = checkType();
         var dragData = {
                 'prevX':prevX,
                 'prevY':prevY,
                 'currX':currentX,
                 'currY':currentY,
                 'penColor':penColor,
-                'penSize':penSize
+                'penSize':penSize,
+                'type' :type
         };
         socket.emit('dragDraw',dragData);
     }
 
     function justClickEmit(){
+        var type = checkType();
         var clickData = {
                 "x":currentX,
                 "y":currentY,
                 "penSize":penSize,
-                "penColor":penColor
+                "penColor":penColor,
+                "type":type
         };
         socket.emit('justClick',  clickData);
     }
@@ -135,11 +163,11 @@ $('document').ready(function(){
     //
     
    
-    $('#inc')
-        .on('click', incPenSize);
+    $('#inc').on('click', incPenSize);
     $('#dec').on('click', decPenSize);
     $('#pColorInp').on('input', penColorChange);
-
+    $('#eraser').on('click', eraserOn);
+    $('#pen').on('click', eraserOff);
     //
     // Event Handlers
     //
@@ -160,7 +188,7 @@ $('document').ready(function(){
         ctx.strokeStyle = color;
     }
     function penColorChange(){
-        penColor = "#"+$('#pColorInp').val();
+       
         $('#pColor').css({background:penColor});
         colorChange(penColor);
     }
@@ -173,14 +201,14 @@ $('document').ready(function(){
     socket.on('drawClick', function(data){
         colorChange(data.penColor);
         drawClick(data.x,data.y,data.penSize);
-        penColor = "#"+$('#pColorInp').val();
+        pen(); 
         colorChange(penColor);
     });
+
     socket.on('drawDrag',function(data){ 
         colorChange(data.penColor);
         drawDrag(data.prevX,data.prevY,data.currX,data.currY,data.penSize);        
-        penColor = "#"+$('#pColorInp').val();
-        console.log("penColor "+penColor+" data pencolor "+data.penColor);
+        pen();
         colorChange(penColor);
     });
 
