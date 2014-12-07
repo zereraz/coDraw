@@ -75,16 +75,16 @@ app.get('/port',function(req,res){
 ==========================*/
 
 io.on('connection', function(socket){
-    io.sockets.emit('hello','Hello Shetty!');
+
     io.sockets.emit('roomPopulation',activeConnections);
 	activeConnections++;
     
     socket.on('justClick',function(clickData){
-        io.sockets.emit('drawClick',clickData); 
+        socket.broadcast.emit('drawClick',clickData); 
     });
 
     socket.on('dragDraw',function(dragData){
-        io.sockets.emit('drawDrag',dragData); 
+        socket.broadcast.emit('drawDrag',dragData); 
     });
     /*
 	io.sockets.emit('userconnect', activeConnections);
