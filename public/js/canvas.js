@@ -168,6 +168,9 @@ $('document').ready(function(){
     $('#pColorInp').on('input', penColorChange);
     $('#eraser').on('click', eraserOn);
     $('#pen').on('click', eraserOff);
+    $('#clearCanvas').on('click', function(){
+         ctx.clearRect(0,0,canvas.width,canvas.height); 
+    });
     //
     // Event Handlers
     //
