@@ -213,6 +213,7 @@ $('document').ready(function(){
     socket.on('drawClick', function(data){
         console.log("click "+ data);
         colorChange(data.penColor);
+        console.log(data.penColor);
         drawClick(data.x,data.y,data.penSize);
         pen(); 
         colorChange(penColor);
