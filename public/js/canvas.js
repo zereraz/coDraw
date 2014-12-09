@@ -21,6 +21,21 @@ $('document').ready(function(){
     //
     var prevT;
     var currT; 
+
+    //
+    //keyboard events
+    //
+    
+    $(document).keypress(function(e){
+//        console.log("which "+e.which+" keyCode "+e.keyCode+" window "+window.event.keyCode); 
+        if(e.which == 61 || e.keyCode == 61 || window.event.keyCode == 61){
+            incPenSize()
+        }
+        if(e.which == 45 || e.keyCode == 45 || window.event.keyCode == 45){
+            decPenSize()
+        }
+    });
+
     //
 	// Mouse on events
 	//
@@ -117,6 +132,7 @@ $('document').ready(function(){
     function eraserOn(){
         eraser = true;
         penColor = "#123";
+        penColorChange();
     }
     function eraserOff(){
         eraser = false;
@@ -124,9 +140,10 @@ $('document').ready(function(){
     }
     
     function pen(){
+        
         if(!eraser)
              penColor = "#"+$('#pColorInp').val();
-        if(penColor.length<=1){
+        if(penColor.length<=1 && !eraser){
             penColor = "#000000";
         }
     }
@@ -202,6 +219,7 @@ $('document').ready(function(){
     function penColorChange(){
         pen();
         $('#pColor').css({background:penColor});
+        console.log(penColor);
         colorChange(penColor);
     }
 
