@@ -87,10 +87,12 @@ $('document').ready(function(){
             
             ctx.beginPath();
 //			ctx.fillRect(currentX-penSize/2, currentY-penSize/2, penSize,penSize);
-			ctx.arc(currentX, currentY,penSize-(penSize/2),0,2*Math.PI,false);
             pen();
-            console.log(penColor);
             ctx.fillStyle = penColor; 
+            ctx.arc(currentX, currentY,penSize-(penSize/2),0,2*Math.PI,false);
+   
+            console.log(penColor);
+    
             ctx.fill();
             ctx.closePath();
       
