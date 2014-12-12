@@ -208,13 +208,23 @@ $('document').ready(function(){
 	
     function dragDrawEmit(){
         var type = checkType();
-        var dragData = {
+        /*var dragData = {
                 'prevX':prevX,
                 'prevY':prevY,
                 'currX':currentX,
                 'currY':currentY,
                 'penColor':penColor,
                 'penSize':penSize,
+                'type' :type
+        };
+*/
+        var dragData = {
+                'prevRatioX':prevX/canvas.width,
+                'prevRatioY':prevY/canvas.height,
+                'currRatioX':currentX/canvas.width,
+                'currRatioY':currentY/canvas.height,
+                'penColor':penColor,
+                'penRatio':penSize/(canvas.width*canvas.height),
                 'type' :type
         };
         socket.emit('dragDraw',dragData);

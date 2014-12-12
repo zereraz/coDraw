@@ -10,6 +10,7 @@ label{
     margin:10px;
 }
 canvas{
+    z-index:2;
     position:absolute;
     top:50px;
     right:0px;
@@ -93,6 +94,7 @@ canvas{
  *
  */
 #info{
+    z-index:0;
     display:block;
     background-color:#123456;
     position:absolute;
