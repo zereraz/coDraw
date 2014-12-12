@@ -109,19 +109,17 @@ $('document').ready(function(){
 	}
 
 	function init(){
-
         canvas = document.getElementById('canvas'); 
 		ctx = canvas.getContext('2d');
 		width = canvas.width;
 		height = canvas.height;
         imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
-        ctx.lineJoin = 'round';
-        ctx.lineCap = 'round';
 		canvas.addEventListener('mousedown', onMouseDown);
 		canvas.addEventListener('mouseup', onMouseUp);
 		canvas.addEventListener('mousemove', onMouseMove);
 		canvas.addEventListener('mouseout', onMouseOut);
-
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
     }
 
     //
