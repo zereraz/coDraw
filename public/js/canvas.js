@@ -19,13 +19,17 @@ $('document').ready(function(){
     // Previous position of mouse
 	var prevX;
 	var prevY;
-    
+
+    // ImageData i.e Save
+    var imageData;
+
     // Flags
     var mouseClick = false;
 	var moving = false;
+    var isFullScreen = false;
     var penSize = parseInt($('#pSize').text());
 	var penColor = "#000000";
-       
+    var prevPenColor = "#000000";       
     var eraser = false;
  
     //
@@ -37,7 +41,7 @@ $('document').ready(function(){
     //
     // 2 eraser
     // 1 pen
-    //
+    // 'enter' key to enter fullscreen or escape fullScreen
     
     $(document).keypress(function(e){
         console.log("which "+e.which+" keyCode "+e.keyCode+" window "+window.event.keyCode); 
@@ -60,6 +64,16 @@ $('document').ready(function(){
         // 1        
         if(e.which == 49 || e.keyCode == 49 || window.event.keyCode == 49){
             eraserOff();
+        }
+
+        // enter 
+        if(e.which == 13 || e.keyCode == 13 || window.event.keyCode == 13){
+            if(!isFullScreen){
+                fullScreen();
+            }else{
+                endFullScreen();     
+            }
+            
         }
     });
 
@@ -100,6 +114,7 @@ $('document').ready(function(){
 		ctx = canvas.getContext('2d');
 		width = canvas.width;
 		height = canvas.height;
+        imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
 		canvas.addEventListener('mousedown', onMouseDown);
@@ -157,13 +172,15 @@ $('document').ready(function(){
     
     function eraserOn(){
         eraser = true;
-        
+        prevPenColor = penColor;
+        penColor = "#123";
         penColorChange();
     }
     
     function eraserOff(){
         eraser = false;
-       
+        penColor = prevPenColor;
+        penColorChange();
     }
     
     function pen(){
@@ -216,21 +233,40 @@ $('document').ready(function(){
     }
 
     //
-    // Events
+    // Events (click , input)
     //
     
    
+    // Click on the + button
     $('#inc').on('click', incPenSize);
+
+    // Click on - button
     $('#dec').on('click', decPenSize);
+
+    // Input on the color change of pen 
     $('#pColorInp').on('input', penColorChange);
+   
+    // Click on eraser
     $('#eraser').on('click', eraserOn);
+
+    // Click on button pen
     $('#pen').on('click', eraserOff);
 
     // Clear Canvas
     $('#clearCanvas').on('click', function(){
         ctx.clearRect(0,0,canvas.width,canvas.height); 
     });
-    
+
+    // Full Screen
+    $('#fullScreen').on('click', function(){
+        if(!isFullScreen){
+            fullScreen();
+        }else{
+            endFullScreen();
+        }
+
+    });
+
     //
     // Event Handlers
     //
@@ -259,6 +295,22 @@ $('document').ready(function(){
     function penColorChange(){
         pen(); 
         $('#pColor').css({background:penColor}); 
+    }
+
+    // Fullscreen for canvas
+    function fullScreen(){
+        isFullScreen = true;
+        console.log(ctx);
+        imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
+        canvas.width = $(window).width();
+        canvas.height = $(window).height();
+        //ctx.drawImage 
+    }
+    // exit from full scree
+    function endFullScreen(){
+        isFullScreen = false;
+        canvas.width = width;
+        canvas.height = height;
     }
 
     init();
