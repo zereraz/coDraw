@@ -8,8 +8,9 @@ it uses socket.io
  - ~~Basic socket setup~~
  - ~~Working canvas~~
  - ~~Draw on canvas~~ 
- - update client side of sockets
- - talk with android app(send messages back and forth)
+ - ~~update client side of sockets~~
+ - ~~Talk with android app(send messages back and forth)~~
+ - 
 ### Install
 
  `npm install` 

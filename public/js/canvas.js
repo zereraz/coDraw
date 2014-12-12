@@ -1,38 +1,65 @@
 $('document').ready(function(){
 
 	var canvas;
-	var ctx;
+    
+    // Context
+    var ctx;
+
+    // socket object 
+    var socket = io();
+    // Width of canvas
 	var width;
-	var height;
+	// Height of canvas
+    var height;
+
+    // Current position of mouse
 	var currentX;
 	var currentY;
+
+    // Previous position of mouse
 	var prevX;
 	var prevY;
-	var mouseClick = false;
+    
+    // Flags
+    var mouseClick = false;
 	var moving = false;
     var penSize = parseInt($('#pSize').text());
 	var penColor = "#000000";
-    var socket = io();
+       
     var eraser = false;
+ 
     //
-    // Timers
+    // keyboard events
     //
-    // prevT, currT
     //
-    var prevT;
-    var currT; 
-
+    // + increase size of pen 
+    // - decrease size of pen
     //
-    //keyboard events
+    // 2 eraser
+    // 1 pen
     //
     
     $(document).keypress(function(e){
-//        console.log("which "+e.which+" keyCode "+e.keyCode+" window "+window.event.keyCode); 
+        console.log("which "+e.which+" keyCode "+e.keyCode+" window "+window.event.keyCode); 
+        
+        // + 
         if(e.which == 61 || e.keyCode == 61 || window.event.keyCode == 61){
-            incPenSize()
+            incPenSize();
         }
+        
+        // -     
         if(e.which == 45 || e.keyCode == 45 || window.event.keyCode == 45){
-            decPenSize()
+            decPenSize();
+        }
+        
+        // 2
+        if(e.which == 50 || e.keyCode == 50 || window.event.keyCode == 50){
+            eraserOn();
+        }
+        
+        // 1        
+        if(e.which == 49 || e.keyCode == 49 || window.event.keyCode == 49){
+            eraserOff();
         }
     });
 
@@ -79,7 +106,7 @@ $('document').ready(function(){
 		canvas.addEventListener('mouseup', onMouseUp);
 		canvas.addEventListener('mousemove', onMouseMove);
 		canvas.addEventListener('mouseout', onMouseOut);
-    
+
     }
 
     //
@@ -98,29 +125,27 @@ $('document').ready(function(){
 		currentX = e.offsetX;
 		currentY = e.offsetY;	
 	}
-    function drawClick(currentX, currentY, penSize){
-            
+    
+    function drawClick(currentX, currentY, penSize){ 
             ctx.beginPath();
 //			ctx.fillRect(currentX-penSize/2, currentY-penSize/2, penSize,penSize);
-            pen();
-            ctx.fillStyle = penColor; 
             ctx.arc(currentX, currentY,penSize-(penSize/2),0,2*Math.PI,false);
-   
-            console.log(penColor);
-    
             ctx.fill();
             ctx.closePath();
       
     }
-    function drawDrag(prevX,prevY,currX,currY,penSize){ 
-            ctx.beginPath();
-			ctx.moveTo(prevX, prevY);
+    
+    function drawDrag(prevX,prevY,currX,currY,penSize){  
+            ctx.beginPath(); 
+            ctx.moveTo(prevX, prevY);
 			ctx.lineTo(currX,currY);
 			ctx.lineWidth = penSize;
 			ctx.stroke();
 			ctx.closePath();
     } 
+    
     function drawStroke(){
+        colorChange(penColor);
 		if(!moving){
             drawClick(currentX,currentY,penSize);
             justClickEmit();
@@ -129,27 +154,32 @@ $('document').ready(function(){
             dragDrawEmit();
         }
 	}
+    
     function eraserOn(){
         eraser = true;
-        penColor = "#123";
+        
         penColorChange();
     }
+    
     function eraserOff(){
         eraser = false;
-        pen();
+       
     }
     
     function pen(){
-        
-        if(!eraser)
+        if(!eraser){
              penColor = "#"+$('#pColorInp').val();
-        if(penColor.length<=1 && !eraser){
+            console.log(penColor);
+        }
+        if(penColor.length<=1){
             penColor = "#000000";
         }
     }
+    
     //
     // Sockets Emit Data to server
     //
+    
     function checkType(){
 
         if(eraser){
@@ -158,7 +188,8 @@ $('document').ready(function(){
             return 'p';
         }
     }
-	function dragDrawEmit(){
+	
+    function dragDrawEmit(){
         var type = checkType();
         var dragData = {
                 'prevX':prevX,
@@ -194,44 +225,50 @@ $('document').ready(function(){
     $('#pColorInp').on('input', penColorChange);
     $('#eraser').on('click', eraserOn);
     $('#pen').on('click', eraserOff);
+
+    // Clear Canvas
     $('#clearCanvas').on('click', function(){
-         ctx.clearRect(0,0,canvas.width,canvas.height); 
+        ctx.clearRect(0,0,canvas.width,canvas.height); 
     });
+    
     //
     // Event Handlers
     //
     
+    // Increase Pen Size 
     function incPenSize(){
         penSize +=1;
         $('#pSize').text(penSize);
         $('#pColor').css({width:penSize,height:penSize});
     }
 
+    // Decrease Pen Size 
     function decPenSize(){
         penSize -=1;
         $('#pSize').text(penSize);
         $('#pColor').css({width:penSize,height:penSize});
     }
+    
+    // Change Color
     function colorChange(color){
         ctx.fillStyle = color;
         ctx.strokeStyle = color;
     }
+    
+    // Change the color 
     function penColorChange(){
-        pen();
-        $('#pColor').css({background:penColor});
-        console.log(penColor);
-        colorChange(penColor);
+        pen(); 
+        $('#pColor').css({background:penColor}); 
     }
 
     init();
+    
     //
     // socket events
     //
     
     socket.on('drawClick', function(data){
-        console.log("click "+ data);
         colorChange(data.penColor);
-        console.log(data.penColor);
         drawClick(data.x,data.y,data.penSize);
         pen(); 
         colorChange(penColor);
@@ -239,7 +276,6 @@ $('document').ready(function(){
 
     socket.on('drawDrag',function(data){ 
         colorChange(data.penColor);
-        console.log("click "+ data);
         drawDrag(data.prevX,data.prevY,data.currX,data.currY,data.penSize);        
         pen();
         colorChange(penColor);
