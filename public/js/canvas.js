@@ -304,13 +304,15 @@ $('document').ready(function(){
         imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
         canvas.width = $(window).width();
         canvas.height = $(window).height();
-        //ctx.drawImage 
+        ctx.putImageData(imageData,0,0);
     }
     // exit from full scree
     function endFullScreen(){
+        imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
         isFullScreen = false;
         canvas.width = width;
-        canvas.height = height;
+        canvas.height = height; 
+        ctx.putImageData(imageData,0,0);
     }
 
     init();
