@@ -148,7 +148,15 @@ $('document').ready(function(){
       
     }
     
-    function drawDrag(prevX,prevY,currX,currY,penSize){  
+    function drawDragRatio(prevRatioX,prevRatioY,currRatioX,currRatioY,penRatio){      
+            ctx.beginPath(); 
+            ctx.moveTo(prevRatioX*canvas.width, prevRatioY*canvas.height);
+			ctx.lineTo(currRatioX*canvas.width,currRatioY*canvas.height);
+			ctx.lineWidth = penRatio*(canvas.width*canvas.height);
+			ctx.stroke();
+			ctx.closePath();
+    } 
+    function drawDrag(prevX,prevY,currX,currY,penSize){      
             ctx.beginPath(); 
             ctx.moveTo(prevX, prevY);
 			ctx.lineTo(currX,currY);
@@ -329,6 +337,7 @@ $('document').ready(function(){
     // socket events
     //
     
+    
     socket.on('drawClick', function(data){
         colorChange(data.penColor);
         drawClick(data.x,data.y,data.penSize);
@@ -338,7 +347,7 @@ $('document').ready(function(){
 
     socket.on('drawDrag',function(data){ 
         colorChange(data.penColor);
-        drawDrag(data.prevX,data.prevY,data.currX,data.currY,data.penSize);        
+        drawDragRatio(data.prevRatioX,data.prevRatioY,data.currRatioX,data.currRatioY,data.penRatio);        
         pen();
         colorChange(penColor);
     });
