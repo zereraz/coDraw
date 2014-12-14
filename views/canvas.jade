@@ -1,23 +1,15 @@
 extends index
 block content 
     div(id="options")
-            h2(id="ctrl") Control Panel
-            button(id="clearCanvas") Clear
-            h3 background-color
-            div(id="bg")
-                input(id="bColorInp")
-               
-            hr
-            h3 pen
+            button(id="clearCanvas") Clear Canvas
+            button(id="downloadCanvas") Download as Image
             div(id="penSz")
                 h3(id="pSize") 5
                 button(id="inc") + [+]
                 button(id="dec") - [-]
-            br
-            br
             div(id="pColor") 
             div(id="penColor") 
-                p #
+                p pen color(hex) #
                     input(id="pColorInp") 
             button(id="eraser") eraser [2]
             button(id="pen") pen [1]

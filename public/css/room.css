@@ -13,7 +13,7 @@ canvas{
     z-index:2;
     position:absolute;
     top:50px;
-    right:0px;
+    left:35%;
     float:right;
     display:block;
     background-color:"#123";
@@ -59,11 +59,12 @@ canvas{
     border-radius:200px;
 }
 #options{
+    border:1px solid black;
     color:#bbb;
-    width:40%;
+    width:20%;
     padding:40px 10px;
     background:#123456;
-    height:200px;
+    height:100px;
     position:absolute;
     top:50px;
     overflow:scroll;
