@@ -283,6 +283,13 @@ $('document').ready(function(){
 
     });
 
+    $('#downloadCanvasLink').on('click',function(){
+        
+        this.href = document.getElementById('canvas').toDataURL();
+           console.log($(this).href);
+        this.download = 'image.png';
+    });
+
     //
     // Event Handlers
     //
