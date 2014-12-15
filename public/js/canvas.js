@@ -323,14 +323,15 @@ $('document').ready(function(){
     // Fullscreen for canvas
     function fullScreen(){
         isFullScreen = true;
-        console.log(ctx);
         imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
         canvas.width = $(window).width();
         canvas.height = $(window).height();
+        $('#canvas').css('left','0px');
         ctx.putImageData(imageData,0,0);
     }
     // exit from full scree
     function endFullScreen(){
+        $('#canvas').css('left','35%');
         imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
         isFullScreen = false;
         canvas.width = width;
