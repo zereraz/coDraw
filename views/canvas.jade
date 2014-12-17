@@ -2,6 +2,8 @@ extends index
 block content 
     div(id="options")
             button(id="clearCanvas") Clear Canvas
+            button(id="undo") undo
+            button(id="redo") redo
             a(id="downloadCanvasLink")
                 button(id="downloadCanvas") Download as Image
             div(id="penSz")
@@ -13,7 +15,8 @@ block content
                 p pen color(hex) #
                     input(id="pColorInp") 
             button(id="eraser") eraser [2]
-            button(id="pen") pen [1]
+            button(id="pen") pen [1] 
+    canvas(id="canvasBg", width="500", height="500")
     canvas(id="canvas", width="500", height="500")
     button(id="fullScreen") Full Screen
     div(id="info")

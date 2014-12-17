@@ -1,9 +1,10 @@
 $('document').ready(function(){
 
 	var canvas;
-    
+    var canvasBg;    
     // Context
     var ctx;
+    var ctxBg;
 
     // socket object 
     var socket = io();
@@ -31,7 +32,11 @@ $('document').ready(function(){
 	var penColor = "#000000";
     var prevPenColor = "#000000";       
     var eraser = false;
- 
+    // undo
+    var undo = []; 
+    // redo
+    var redo = [];
+
     //
     // keyboard events
     //
@@ -111,7 +116,10 @@ $('document').ready(function(){
 	function init(){
         canvas = document.getElementById('canvas'); 
 		ctx = canvas.getContext('2d');
-		width = canvas.width;
+		canvasBg = document.getElementById('canvasBg');
+        ctxBg = canvasBg.getContext('2d');
+        ctxBg.fillRect(0,0,canvas.width,canvas.height);
+        width = canvas.width;
 		height = canvas.height;
         imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
 		canvas.addEventListener('mousedown', onMouseDown);
@@ -132,12 +140,25 @@ $('document').ready(function(){
 			prevX = currentX;
 			prevY = currentY;
 		}else{
-			prevX = e.offsetX;
-			prevY = e.offsetY;
+            //for mozilla e.offsetX is undefined
+            if(e.offsetX!=undefined){
+                prevX = e.offsetX;
+                prevY = e.offsetY;
+            }else{
+                prevX= e.pageX-$('#canvas').offset().left;
+                prevY= e.pageY-$('#canvas').offset().top;
+            }
 		}
-		currentX = e.offsetX;
-		currentY = e.offsetY;	
-	}
+        //for mozilla e.offsetX is undefined
+        if(e.offsetX!=undefined){
+            currentX= e.offsetX;
+            currentY= e.offsetY;
+        }else{
+            currentX= e.pageX-$('#canvas').offset().left;
+            currentY= e.pageY-$('#canvas').offset().top;
+        }
+	    
+    }
     
     function drawClick(currentX, currentY, penSize){ 
             ctx.beginPath();
@@ -156,7 +177,7 @@ $('document').ready(function(){
 			ctx.stroke();
 			ctx.closePath();
     } 
-    function drawDrag(prevX,prevY,currX,currY,penSize){      
+    function drawDrag(prevX,prevY,currX,currY,penSize){
             ctx.beginPath(); 
             ctx.moveTo(prevX, prevY);
 			ctx.lineTo(currX,currY);
@@ -191,8 +212,9 @@ $('document').ready(function(){
     
     function pen(){
         if(!eraser){
-             penColor = "#"+$('#pColorInp').val();
-            console.log(penColor);
+             penColor = "#"+$('#pColorInp').val();    
+        }else{
+            penColor = "#123";
         }
         if(penColor.length<=1){
             penColor = "#000000";
@@ -214,16 +236,14 @@ $('document').ready(function(){
 	
     function dragDrawEmit(){
         var type = checkType();
-        /*var dragData = {
+        var undoData = {
                 'prevX':prevX,
                 'prevY':prevY,
                 'currX':currentX,
                 'currY':currentY,
-                'penColor':penColor,
-                'penSize':penSize,
-                'type' :type
+                'penSize':penSize, 
         };
-*/
+        undo.push(undoData);
         var dragData = {
                 'prevRatioX':prevX/canvas.width,
                 'prevRatioY':prevY/canvas.height,
@@ -245,6 +265,7 @@ $('document').ready(function(){
                 "penColor":penColor,
                 "type":type
         };
+//        undo.push(clickData);
         socket.emit('justClick',  clickData);
     }
 
@@ -283,12 +304,27 @@ $('document').ready(function(){
 
     });
 
+    //Download the canvas
     $('#downloadCanvasLink').on('click',function(){
-        
+        var name = prompt("Name of image"); 
         this.href = document.getElementById('canvas').toDataURL();
-           console.log($(this).href);
-        this.download = 'image.png';
+        this.download = name+'png';
     });
+    // Undo
+    $('#undo').on('click',function(){ 
+        eraserOn();
+        colorChange("#123");
+        for(var i=0;i<undo.length;i++){     
+            drawDrag(undo[i].prevX,undo[i].prevY,undo[i].currX,undo[i].currY,undo[i].penSize+1);
+        }
+        for(var i=0;i<undo.length;i++){
+            undo.shift();
+        }
+
+        eraserOff();
+    });
+    // Redo 
+    $('#redo').on('click', redo);
 
     //
     // Event Handlers
@@ -329,14 +365,27 @@ $('document').ready(function(){
         $('#canvas').css('left','0px');
         ctx.putImageData(imageData,0,0);
     }
-    // exit from full scree
+    // exit from full screen
     function endFullScreen(){
         $('#canvas').css('left','35%');
-        imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
+        imageData = ctx.getImageData(0,0,$(window).width(),$(window).height()); 
         isFullScreen = false;
         canvas.width = width;
         canvas.height = height; 
         ctx.putImageData(imageData,0,0);
+    }
+    
+    function undo(){
+        eraserOn();
+        penColor = "#123";
+        for(var i=0;i<undo.length;i++){
+            drawDrag(undo[i].prevX,undo[i].prevY,undo[i].currX,undo[i].currY,undo[i].penSize);
+        }
+        eraserOff();
+    }
+
+    function redo(){
+
     }
 
     init();

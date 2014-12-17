@@ -4,7 +4,7 @@ $(document).ready(function(){
         console.log("hello shetty");
     });
     socket.on('roomPopulation', function(activeConnections){
-        console.log(activeConnections);
+
     });
 });
 
