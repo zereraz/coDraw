@@ -281,7 +281,7 @@ $('document').ready(function(){
     $('#dec').on('click', decPenSize);
 
     // Input on the color change of pen 
-    $('#pColorInp').on('input', penColorChange);
+    $('#pColorInp').on('change', penColorChange);
    
     // Click on eraser
     $('#eraser').on('click', eraserOn);
@@ -352,7 +352,7 @@ $('document').ready(function(){
     
     // Change the color 
     function penColorChange(){
-        pen(); 
+        pen();
         $('#pColor').css({background:penColor}); 
     }
 
