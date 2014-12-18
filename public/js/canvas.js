@@ -380,17 +380,25 @@ $('document').ready(function(){
         imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
         canvas.width = $(window).width();
         canvas.height = $(window).height();
+        canvasBg.width = $(window).width();
+        canvasBg.height = $(window).height();
+        bg();
         $('#canvas').css('left','0px');
+        $('#canvasBg').css('left','0px');
         ctx.putImageData(imageData,0,0);
     }
     // exit from full screen
     function endFullScreen(){
         $('#canvas').css('left','35%');
+        $('#canvasBg').css('left','35%');
         imageData = ctx.getImageData(0,0,$(window).width(),$(window).height()); 
         isFullScreen = false;
         canvas.width = width;
         canvas.height = height; 
+        canvasBg.width = width; 
+        canvasBg.height = height;
         ctx.putImageData(imageData,0,0);
+        bg(); 
     }
     
     function undo(){
