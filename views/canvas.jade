@@ -2,8 +2,6 @@ extends index
 block content 
     div(id="options")
             button(id="clearCanvas") Clear Canvas
-            button(id="undo") undo
-            button(id="redo") redo
             a(id="downloadCanvasLink")
                 button(id="downloadCanvas") Download as Image
             div(id="penSz")
@@ -13,7 +11,7 @@ block content
             div(id="pColor") 
             div(id="penColor") 
                 p pen color(hex) #
-                    input(class="color{pickerFaceColor:'transparent',pickerFace:3,pickerBorder:0,pickerInsetColor:'black'}", value="ffffff", id="pColorInp") 
+                    input(class="color{pickerFaceColor:'transparent',pickerFace:3,pickerBorder:0,pickerInsetColor:'black'}", value="000000", id="pColorInp") 
             div(id="bColor") 
             div(id="bgColor") 
                 p background color(hex) #

@@ -223,14 +223,56 @@ $('document').ready(function(){
         }
     }
     
-    function bg(){ 
+    function bg(){  
+        if(bgColor.length<=1){
+            bgColor = "#ffffff";
+        }
+        removeColor(bgColor);
         bgColor = "#"+$('#bgColorInp').val();    
         if(bgColor.length<=1){
             bgColor = "#ffffff";
         }
-        ctxBg.fillStyle = bgColor;
+        if(eraser){
+            eraserOn();
+        }else{
+            eraserOff();
+        }
+        ctxBg.fillStyle = bgColor; 
         ctxBg.fillRect(0,0,canvas.width,canvas.height);
     }
+    
+    
+    //Remove this color from canvas
+    function removeColor(color){
+        var imgData = ctx.getImageData(0,0,canvas.width,canvas.height);
+        var pix = imgData.data;
+        color = color.slice(1,color.length);
+        var newColor = hexToRgb(color); 
+        var newBgColor = $('#bgColorInp').val();
+        newBgColor = hexToRgb(newBgColor);
+        for(var i = 0, n = pix.length;i<n;i += 4){
+            var r = pix[i],
+                g = pix[i+1],
+                b = pix[i+2];
+            if(r==newColor.r && g==newColor.g && b==newColor.b){
+                /*pix[i] = newBgColor.r;
+                pix[i+1] = newBgColor.g;
+                pix[i+2] = newBgColor.b;
+                */
+                pix[i+3] = 0;
+            }
+        }
+        ctx.putImageData(imgData, 0, 0);
+    }
+    
+    function hexToRgb(hex) {
+        var bigint = parseInt(hex, 16);
+        var r = (bigint >> 16) & 255;
+        var g = (bigint >> 8) & 255;
+        var b = bigint & 255;
+        return {r:r,g:g,b:b};
+    }
+    
     //
     // Sockets Emit Data to server
     //
@@ -246,7 +288,7 @@ $('document').ready(function(){
 	
     function dragDrawEmit(){
         var type = checkType();
-        var undoData = {
+       /* var undoData = {
                 'prevX':prevX,
                 'prevY':prevY,
                 'currX':currentX,
@@ -254,6 +296,7 @@ $('document').ready(function(){
                 'penSize':penSize, 
         };
         undo.push(undoData);
+        */
         var dragData = {
                 'prevRatioX':prevX/canvas.width,
                 'prevRatioY':prevY/canvas.height,
@@ -321,10 +364,10 @@ $('document').ready(function(){
     $('#downloadCanvasLink').on('click',function(){
         var name = prompt("Name of image"); 
         this.href = document.getElementById('canvas').toDataURL();
-        this.download = name+'png';
+        this.download = name;
     });
     // Undo
-    $('#undo').on('click',function(){ 
+/*    $('#undo').on('click',function(){ 
         eraserOn();
         colorChange(bgColor);
         for(var i=0;i<undo.length;i++){     
@@ -336,9 +379,10 @@ $('document').ready(function(){
 
         eraserOff();
     });
+
     // Redo 
     $('#redo').on('click', redo);
-
+*/
     //
     // Event Handlers
     //
@@ -404,7 +448,7 @@ $('document').ready(function(){
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
     }
-    
+   /* 
     function undo(){
         eraserOn();
         penColor = bgColor;
@@ -417,7 +461,7 @@ $('document').ready(function(){
     function redo(){
 
     }
-
+*/
     init();
     
     //
@@ -427,6 +471,7 @@ $('document').ready(function(){
     socket.on('drawClick', function(data){
         colorChange(data.penColor);
         drawClick(data.x,data.y,data.penSize);
+                pix[i] = newColor.r;
         pen(); 
         colorChange(penColor);
     });
