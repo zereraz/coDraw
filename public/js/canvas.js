@@ -31,6 +31,7 @@ $('document').ready(function(){
     var penSize = parseInt($('#pSize').text());
 	var penColor = "#000000";
     var prevPenColor = "#000000";       
+    var bgColor = "#ffffff";
     var eraser = false;
     // undo
     var undo = []; 
@@ -117,7 +118,8 @@ $('document').ready(function(){
         canvas = document.getElementById('canvas'); 
 		ctx = canvas.getContext('2d');
 		canvasBg = document.getElementById('canvasBg');
-        ctxBg = canvasBg.getContext('2d');
+        ctxBg = canvasBg.getContext('2d'); 
+        ctxBg.fillStyle = bgColor;
         ctxBg.fillRect(0,0,canvas.width,canvas.height);
         width = canvas.width;
 		height = canvas.height;
@@ -221,6 +223,14 @@ $('document').ready(function(){
         }
     }
     
+    function bg(){ 
+        bgColor = "#"+$('#bgColorInp').val();    
+        if(bgColor.length<=1){
+            bgColor = "#ffffff";
+        }
+        ctxBg.fillStyle = bgColor;
+        ctxBg.fillRect(0,0,canvas.width,canvas.height);
+    }
     //
     // Sockets Emit Data to server
     //
@@ -283,6 +293,9 @@ $('document').ready(function(){
     // Input on the color change of pen 
     $('#pColorInp').on('change', penColorChange);
    
+    // Input on the color change of background 
+    $('#bgColorInp').on('change', bgColorChange);
+    
     // Click on eraser
     $('#eraser').on('click', eraserOn);
 
@@ -350,12 +363,17 @@ $('document').ready(function(){
         ctx.strokeStyle = color;
     }
     
-    // Change the color 
+    // Change the color of pen 
     function penColorChange(){
         pen();
         $('#pColor').css({background:penColor}); 
     }
 
+    // Change the color of background
+    function bgColorChange(){
+        bg();
+        $('#bColor').css({background:bgColor}); 
+    }
     // Fullscreen for canvas
     function fullScreen(){
         isFullScreen = true;
@@ -393,8 +411,7 @@ $('document').ready(function(){
     //
     // socket events
     //
-    
-    
+        
     socket.on('drawClick', function(data){
         colorChange(data.penColor);
         drawClick(data.x,data.y,data.penSize);
