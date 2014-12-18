@@ -202,7 +202,7 @@ $('document').ready(function(){
     function eraserOn(){
         eraser = true;
         prevPenColor = penColor;
-        penColor = "#123";
+        penColor = bgColor; 
         penColorChange();
     }
     
@@ -216,7 +216,7 @@ $('document').ready(function(){
         if(!eraser){
              penColor = "#"+$('#pColorInp').val();    
         }else{
-            penColor = "#123";
+            penColor = bgColor; 
         }
         if(penColor.length<=1){
             penColor = "#000000";
@@ -326,7 +326,7 @@ $('document').ready(function(){
     // Undo
     $('#undo').on('click',function(){ 
         eraserOn();
-        colorChange("#123");
+        colorChange(bgColor);
         for(var i=0;i<undo.length;i++){     
             drawDrag(undo[i].prevX,undo[i].prevY,undo[i].currX,undo[i].currY,undo[i].penSize+1);
         }
@@ -385,7 +385,9 @@ $('document').ready(function(){
         bg();
         $('#canvas').css('left','0px');
         $('#canvasBg').css('left','0px');
-        ctx.putImageData(imageData,0,0);
+        ctx.putImageData(imageData,0,0); 
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
     }
     // exit from full screen
     function endFullScreen(){
@@ -398,12 +400,14 @@ $('document').ready(function(){
         canvasBg.width = width; 
         canvasBg.height = height;
         ctx.putImageData(imageData,0,0);
-        bg(); 
+        bg();  
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
     }
     
     function undo(){
         eraserOn();
-        penColor = "#123";
+        penColor = bgColor;
         for(var i=0;i<undo.length;i++){
             drawDrag(undo[i].prevX,undo[i].prevY,undo[i].currX,undo[i].currY,undo[i].penSize);
         }
