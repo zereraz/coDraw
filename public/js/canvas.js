@@ -201,9 +201,19 @@ $('document').ready(function(){
             dragDrawEmit();
             }
         }else if(text&&!moving){
-                ctx.font=penSize+"px Georgia";
+                var font = "Georgia";
+                ctx.font=penSize+"px "+font; 
                 myString = prompt("Enter text"); 
                 ctx.fillText(myString,currentX,currentY);
+                var textDetails = {
+                    "font":font,
+                    "penSize":penSize,
+                    "currentX":currentX,
+                    "currentY":currentY,
+                    "string":myString,
+                    "color":penColor
+                }
+                socket.emit('text', textDetails);
         }
     }
     //off eraser text
@@ -213,6 +223,7 @@ $('document').ready(function(){
    } 
 // In eraser mode
     function eraserOn(){
+        off();
         eraser = true;
         prevPenColor = penColor;
         penColor = bgColor; 
@@ -498,11 +509,16 @@ $('document').ready(function(){
     //
     // socket events
     //
-        
+    socket.on('textEmit', function(data){
+        ctx.font = data.penSize+"px "+data.font;
+        colorChange(data.color);        
+        console.log(ctx.font);
+        ctx.fillText(data.string,data.currentX,data.currentY);
+        colorChange(penColor); 
+    });     
     socket.on('drawClick', function(data){
         colorChange(data.penColor);
         drawClick(data.x,data.y,data.penSize);
-                pix[i] = newColor.r;
         pen(); 
         colorChange(penColor);
     });

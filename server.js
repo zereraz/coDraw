@@ -86,6 +86,10 @@ io.on('connection', function(socket){
     socket.on('dragDraw',function(dragData){
         socket.broadcast.emit('drawDrag',dragData); 
     });
+
+    socket.on('text',function(textData){
+        socket.broadcast.emit('textEmit',textData); 
+    });
     /*
 	io.sockets.emit('userconnect', activeConnections);
 	socket.on('disconnect', function(){
