@@ -19,6 +19,7 @@ var port = process.env.PORT || 3000;
 var index = require('./routes/index');
 var room = require('./routes/room');
 var activeConnections = 0;
+var myRoom = 0;
 
 /*==========================
  *
@@ -55,10 +56,11 @@ app.set('views',__dirname+'/views');
 ==========================*/
 
 //root
-//app.get('/',index.root);
-app.get('/', function(req,res){
+app.get('/',index.root);
+/*app.get('/', function(req,res){
     res.render('canvas');
 });
+*/
 //room
 app.get('/room', room.getRoom);
 app.post('/room', room.postRoom);
@@ -75,7 +77,16 @@ app.get('/port',function(req,res){
 ==========================*/
 
 io.on('connection', function(socket){
-
+    myRoom = room.getRoom();
+    if(myRoom!=0){
+        io.sockets.emit('myRoom',myRoom);
+        socket.join(myRoom);
+    }
+    io.sockets.on('disconnect', function(){
+        activeConnections--;
+        io.sockets.emit('userDisconnected',activeConnections);
+        socket.leave(myRoom);
+    });
     io.sockets.emit('roomPopulation',activeConnections);
 	activeConnections++;
     
@@ -103,6 +114,8 @@ io.on('connection', function(socket){
 		io.sockets.emit('drawend', uid, co_ordinates);
 	});
 */
+
+
 });
 
 /*==========================

@@ -1,7 +1,8 @@
+var myRoom = 0;
+var rooms = [];
 exports.getRoom = function(req, res){
 
 	if(req.session.roomId !== undefined){
-		console.log(req.session.roomId);	
 		res.render('canvas');
 	}else{
 	
@@ -9,11 +10,20 @@ exports.getRoom = function(req, res){
 	}
 }
 
+exports.getRoom = function(){
+    return myRoom;
+}
 
 exports.postRoom = function(req, res){
 
 	var roomId = req.body.roomId;
-	req.session.roomId = roomId;
-	res.render("canvas");
+    if(rooms.indexOf(roomId)==-1){
+        rooms.push(roomId);    
+        req.session.roomId = roomId;
+        myRoom = roomId;
+        res.render("canvas");
+    }else{
+        res.send("Room not available");
+    }
 	
 }

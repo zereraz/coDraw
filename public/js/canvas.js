@@ -24,6 +24,8 @@ $('document').ready(function(){
     // ImageData i.e Save
     var imageData;
 
+    // room id
+    var myRoom;
     // Flags
     var mouseClick = false;
 	var moving = false;
@@ -203,17 +205,19 @@ $('document').ready(function(){
         }else if(text&&!moving){
                 var font = "Georgia";
                 ctx.font=penSize+"px "+font; 
-                myString = prompt("Enter text"); 
-                ctx.fillText(myString,currentX,currentY);
-                var textDetails = {
-                    "font":font,
-                    "penSize":penSize,
-                    "currentX":currentX,
-                    "currentY":currentY,
-                    "string":myString,
-                    "color":penColor
-                }
-                socket.emit('text', textDetails);
+                myString = prompt("Enter text");
+                if(myString){
+                    ctx.fillText(myString,currentX,currentY);
+                    var textDetails = {
+                        "font":font,
+                        "penSize":penSize,
+                        "currentX":currentX,
+                        "currentY":currentY,
+                        "string":myString,
+                        "color":penColor
+                    }
+                    socket.emit('text', textDetails);
+                } 
         }
     }
     //off eraser text
@@ -509,6 +513,10 @@ $('document').ready(function(){
     //
     // socket events
     //
+    socket.on('myRoom', function(room){
+        console.log(room);
+        myRoom = room;
+    });
     socket.on('textEmit', function(data){
         ctx.font = data.penSize+"px "+data.font;
         colorChange(data.color);        
