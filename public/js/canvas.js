@@ -214,7 +214,8 @@ $('document').ready(function(){
                         "currentX":currentX,
                         "currentY":currentY,
                         "string":myString,
-                        "color":penColor
+                        "color":penColor,
+                        "room":myRoom
                     }
                     socket.emit('text', textDetails);
                 } 
@@ -347,7 +348,8 @@ $('document').ready(function(){
                 'currRatioY':currentY/canvas.height,
                 'penColor':penColor,
                 'penRatio':penSize/(canvas.width*canvas.height),
-                'type' :type
+                'type' :type,
+                "room":myRoom
         };
         socket.emit('dragDraw',dragData);
     }
@@ -359,7 +361,8 @@ $('document').ready(function(){
                 "y":currentY,
                 "penSize":penSize,
                 "penColor":penColor,
-                "type":type
+                "type":type,
+                "room":myRoom
         };
 //        undo.push(clickData);
         socket.emit('justClick',  clickData);
@@ -513,6 +516,10 @@ $('document').ready(function(){
     //
     // socket events
     //
+    
+    socket.on('error', function(data){
+        console.log(data);
+    });
     socket.on('myRoom', function(room){
         console.log(room);
         myRoom = room;
@@ -532,6 +539,7 @@ $('document').ready(function(){
     });
 
     socket.on('drawDrag',function(data){ 
+        console.log(myRoom);
         colorChange(data.penColor);
         drawDragRatio(data.prevRatioX,data.prevRatioY,data.currRatioX,data.currRatioY,data.penRatio);        
         pen();

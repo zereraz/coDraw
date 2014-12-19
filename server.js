@@ -63,7 +63,8 @@ app.get('/',index.root);
 */
 //room
 app.get('/room', room.getRoom);
-app.post('/room', room.postRoom);
+app.post('/createroom', room.pCreateRoom);
+app.post('/joinroom', room.pJoinRoom);
 
 //port
 app.get('/port',function(req,res){
@@ -79,28 +80,33 @@ app.get('/port',function(req,res){
 io.on('connection', function(socket){
     myRoom = room.getRoom();
     if(myRoom!=0){
+        myRoom = room.getRoom();
         io.sockets.emit('myRoom',myRoom);
         socket.join(myRoom);
-    }
-    io.sockets.on('disconnect', function(){
-        activeConnections--;
-        io.sockets.emit('userDisconnected',activeConnections);
-        socket.leave(myRoom);
-    });
-    io.sockets.emit('roomPopulation',activeConnections);
-	activeConnections++;
     
-    socket.on('justClick',function(clickData){
-        socket.broadcast.emit('drawClick',clickData); 
-    });
+        io.sockets.on('disconnect', function(){
+            activeConnections--;
+            io.sockets.emit('userDisconnected',activeConnections);
+            socket.leave(myRoom);
+        });
+        io.sockets.in(myRoom).emit('roomPopulation',activeConnections);
+            activeConnections++;
+        
+        socket.on('justClick',function(clickData){
+            socket.broadcast.to(clickData.room).emit('drawClick',clickData); 
+        });
 
-    socket.on('dragDraw',function(dragData){
-        socket.broadcast.emit('drawDrag',dragData); 
-    });
+        socket.on('dragDraw',function(dragData){
+            socket.broadcast.to(dragData.room).emit('drawDrag',dragData); 
+        });
 
-    socket.on('text',function(textData){
-        socket.broadcast.emit('textEmit',textData); 
-    });
+        socket.on('text',function(textData){
+            socket.broadcast.to(textData.room).emit('textEmit',textData); 
+        });
+    }else{
+       //IDEA here room 0 where anyone can come, and draw
+        io.sockets.emit('error','Problem resolving the roomId, Please rejoin');
+    }
     /*
 	io.sockets.emit('userconnect', activeConnections);
 	socket.on('disconnect', function(){

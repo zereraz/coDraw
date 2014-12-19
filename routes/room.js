@@ -14,7 +14,7 @@ exports.getRoom = function(){
     return myRoom;
 }
 
-exports.postRoom = function(req, res){
+exports.pCreateRoom = function(req, res){
 
 	var roomId = req.body.roomId;
     if(rooms.indexOf(roomId)==-1){
@@ -26,4 +26,16 @@ exports.postRoom = function(req, res){
         res.send("Room not available");
     }
 	
+}
+
+exports.pJoinRoom = function(req, res){
+    var roomId = req.body.roomId;
+    if(rooms.indexOf(roomId)!=-1){
+        req.session.roomId = roomId;
+        myRoom = roomId;
+        res.render("canvas");
+    }else{
+        res.send("Room does not exist, Please create one to join");
+    }
+
 }
