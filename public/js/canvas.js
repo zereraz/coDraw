@@ -33,6 +33,8 @@ $('document').ready(function(){
     var prevPenColor = "#000000";       
     var bgColor = "#ffffff";
     var eraser = false;
+    var text = false;
+    var myString = "";
     // undo
     var undo = []; 
     // redo
@@ -50,38 +52,37 @@ $('document').ready(function(){
     // 'enter' key to enter fullscreen or escape fullScreen
     
     $(document).keypress(function(e){
-        console.log("which "+e.which+" keyCode "+e.keyCode+" window "+window.event.keyCode); 
-        
-        // + 
-        if(e.which == 61 || e.keyCode == 61 || window.event.keyCode == 61){
-            incPenSize();
-        }
-        
-        // -     
-        if(e.which == 45 || e.keyCode == 45 || window.event.keyCode == 45){
-            decPenSize();
-        }
-        
-        // 2
-        if(e.which == 50 || e.keyCode == 50 || window.event.keyCode == 50){
-            eraserOn();
-        }
-        
-        // 1        
-        if(e.which == 49 || e.keyCode == 49 || window.event.keyCode == 49){
-            eraserOff();
-        }
+       // console.log("which "+e.which+" keyCode "+e.keyCode+" window "+window.event.keyCode); 
 
-        // enter 
-        if(e.which == 13 || e.keyCode == 13 || window.event.keyCode == 13){
-            if(!isFullScreen){
-                fullScreen();
-            }else{
-                endFullScreen();     
+            // + 
+            if(e.which == 61 || e.keyCode == 61 || window.event.keyCode == 61){
+                incPenSize();
             }
             
-        }
-    });
+            // -     
+            if(e.which == 45 || e.keyCode == 45 || window.event.keyCode == 45){
+                decPenSize();
+            }
+            
+            // 2
+            if(e.which == 50 || e.keyCode == 50 || window.event.keyCode == 50){
+                eraserOn();
+            }
+            
+            // 1        
+            if(e.which == 49 || e.keyCode == 49 || window.event.keyCode == 49){
+                eraserOff();
+            }
+
+            // enter 
+            if(e.which == 13 || e.keyCode == 13 || window.event.keyCode == 13){
+                if(!isFullScreen){
+                    fullScreen();
+                }else{
+                    endFullScreen();     
+                }
+            } 
+        });
 
     //
 	// Mouse on events
@@ -190,15 +191,27 @@ $('document').ready(function(){
     
     function drawStroke(){
         colorChange(penColor);
-		if(!moving){
-            drawClick(currentX,currentY,penSize);
-            justClickEmit();
-		}else{
+		if(!text){
+
+        if(!moving){ 
+                drawClick(currentX,currentY,penSize);
+                justClickEmit();
+            }else{
             drawDrag(prevX,prevY,currentX,currentY,penSize);
             dragDrawEmit();
+            }
+        }else if(text&&!moving){
+                ctx.font=penSize+"px Georgia";
+                myString = prompt("Enter text"); 
+                ctx.fillText(myString,currentX,currentY);
         }
-	}
-    
+    }
+    //off eraser text
+    function off(){
+       eraserOff();
+       textOff();
+   } 
+// In eraser mode
     function eraserOn(){
         eraser = true;
         prevPenColor = penColor;
@@ -210,6 +223,22 @@ $('document').ready(function(){
         eraser = false;
         penColor = prevPenColor;
         penColorChange();
+    }
+// In text mode
+    function textOn(){
+        type = 't';
+        text = true;    
+    } 
+
+    function putText(){
+        ctx.font=penSize+"px Georgia";
+        myString = prompt("Enter text"); 
+        ctx.fillText(myString,currentX,currentY);
+    }
+
+    function textOff(){
+        myString = "";
+        text = false;
     }
     
     function pen(){
@@ -278,7 +307,6 @@ $('document').ready(function(){
     //
     
     function checkType(){
-
         if(eraser){
             return 'e'; 
         }else{
@@ -338,12 +366,15 @@ $('document').ready(function(){
    
     // Input on the color change of background 
     $('#bgColorInp').on('change', bgColorChange);
-    
+   
+    //Click on text
+    $('#textTool').on('click', textOn);
+
     // Click on eraser
     $('#eraser').on('click', eraserOn);
 
     // Click on button pen
-    $('#pen').on('click', eraserOff);
+    $('#pen').on('click',off);
 
     // Clear Canvas
     $('#clearCanvas').on('click', function(){
