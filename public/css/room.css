@@ -1,23 +1,23 @@
 body{
     padding:0px;
     margin:0px;
-    background:#123;
+   /*2A2C2B*/ 
+    background:#000;
     width:100%;
     height:100%;
 }
 label{
-    color:#bbb;
+    color:#EF4F1D;
     margin:10px;
 }
 canvas{
     z-index:2;
+    border:5px solid #EF4F1D;
     position:absolute;
     top:50px;
     left:35%;
     float:right;
     display:block;
-    background-color:"#123";
-    border:1px dotted white;
 }
 
 /*============
@@ -63,14 +63,17 @@ canvas{
     border-radius:200px;
 }
 #options{
-    border:1px solid black;
-    color:#bbb;
     width:20%;
+    border:3px solid #EF4F1D;
     padding:40px 10px;
-    background:#123456;
+ /*   box-shadow:-2px -2px 9px rgba(0, 0, 0, 0.7),-4px -4px 20px rgba(0, 0, 0, 0.4);
+    background:-webkit-linear-gradient(top,  #2c354e 0%,#576a97 100%);
+   */ 
+    background:#343434;
     height:100px;
+    color:#EF4F1D; 
     position:absolute;
-    top:50px;
+    top:150px;
     overflow:scroll;
 }
 #options button{
@@ -90,7 +93,7 @@ canvas{
  */
 
 #fullScreen{
-    margin:20px;
+    margin:30px;
 }
 
 /*
@@ -99,16 +102,15 @@ canvas{
  *
  */
 #info{
-    z-index:0;
+    z-index:0; 
+    border:3px solid #EF4F1D;
     display:block;
-    background-color:#123456;
-    position:absolute;
-    border:1px solid black;
+    background-color:#343434;
+    position:absolute; 
     bottom:0px;
     padding:10px;
     margin-left:3px;
-    opacity:0.6; 
-    color:yellow;
+    color:#EF4F1D;
 }
 
 /*
@@ -119,11 +121,12 @@ canvas{
  */
 #status{
     width:100%;
+    border:2px solid #EF4F1D;
     height:20px;
-    background-color:#123456;
+    background-color:#343434;
     position:absolute;
     top:0px;
-    color:yellow;
+    color:#EF4F1D;
     vertical-align:middle;
 }
 #status p{
@@ -131,4 +134,13 @@ canvas{
     top:0px;
     margin:0px;
     left:0px;
+}
+
+/*
+ *buttons
+ */
+button{
+    background:#343434;
+    color:#EF4F1D;
+    border:1px solid #EF4F1D;
 }
