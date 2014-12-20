@@ -14,6 +14,14 @@ exports.getRoom = function(){
     return myRoom;
 }
 
+exports.pop = function(room){
+    var i = rooms.indexOf(room);
+    if(i>-1){
+        rooms.splice(i,1);
+    }
+
+}
+
 exports.pCreateRoom = function(req, res){
 
 	var roomId = req.body.roomId;

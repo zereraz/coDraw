@@ -81,12 +81,13 @@ io.on('connection', function(socket){
     myRoom = room.getRoom();
     if(myRoom!=0){
         myRoom = room.getRoom();
-        io.sockets.emit('myRoom',myRoom);
         socket.join(myRoom);
+        io.sockets.to(myRoom).emit('myRoom',myRoom);
     
         io.sockets.on('disconnect', function(){
             activeConnections--;
             io.sockets.emit('userDisconnected',activeConnections);
+            room.pop(myRoom);
             socket.leave(myRoom);
         });
         io.sockets.in(myRoom).emit('roomPopulation',activeConnections);
