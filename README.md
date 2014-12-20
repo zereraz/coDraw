@@ -10,7 +10,23 @@ it uses socket.io
  - ~~Draw on canvas~~ 
  - ~~update client side of sockets~~
  - ~~Talk with android app(send messages back and forth)~~
- - 
+ - Brush Library
+
+### Feautres
+ - Realtime Drawing
+ - Various tools like
+    - Pen
+    - Eraser
+    - Text
+ - Pen Size
+ - Full Screen mode
+ - Color Picker
+ - Background color change
+ - Drawing namespaced to rooms
+ - Clear Screen
+ - Download Image drawn
+ - Shortcut Keys
+
 ### Install
 
  `npm install` 
