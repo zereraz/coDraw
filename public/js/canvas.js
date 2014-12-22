@@ -31,7 +31,8 @@ $('document').ready(function(){
 	var moving = false;
     var isFullScreen = false;
     var shape = false;
-    
+    // circle on click
+    var x,y;    
     var penSize = parseInt($('#pSize').text());
     var radius;
     var penColor = "#000000";
@@ -86,6 +87,12 @@ $('document').ready(function(){
             if(e.which == 116 || e.keyCode == 116 || window.event.keyCode == 116){
                 textOn();
                 updateCurrentTool($('p'),'text [t]');
+            }
+            
+            // c        
+            if(e.which == 99 || e.keyCode == 99 || window.event.keyCode == 99){
+                circleOn();
+                updateCurrentTool($('p'),'Circle [c]');
             }
 
             // enter 
@@ -202,21 +209,31 @@ $('document').ready(function(){
 			ctx.lineWidth = penSize;
 			ctx.stroke();
 			ctx.closePath();
-    } 
-    function drawCircle(){ 
+    }
+   //drawing circle 
+    function drawCircle(currentX,currentY,radius){ 
             ctx.beginPath();
             ctx.arc(currentX,currentY,radius,0,Math.PI*2);
             ctx.stroke();
-    } 
-    function drawStroke(){
+    }
+    var clearCircle = function(x, y, radius){
+        ctx.save();
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
+        ctx.fill();
+        ctx.restore(); 
+    }
+    function drawStroke(){ 
+        var change;
         colorChange(penColor);
 		if(!text && !shape){
             if(!moving){ 
                     drawClick(currentX,currentY,penSize);
                     justClickEmit();
                 }else{
-                drawDrag(prevX,prevY,currentX,currentY,penSize);
-                dragDrawEmit();
+                    drawDrag(prevX,prevY,currentX,currentY,penSize);
+                    dragDrawEmit();
                 }
             }else if(text && !moving){
                     var font = "Georgia";
@@ -237,22 +254,40 @@ $('document').ready(function(){
                     } 
             }else if(shape && !moving){
                 radius = penSize;
-                switch(type){
+                switch(type[0]){
                     case 'c':
-                        drawCircle();
+                        x = currentX;
+                        y = currentY;
+                        drawCircle(x,y,radius); 
                         break;
                 }
             }else if(shape && moving){
                 switch(type){
-                    case 'c':
-                        var change = currentX - prevX;
-                        radius+=change;
-                        if(radius>0){
-                             drawCircle();
-                        }else{
-                            radius = 0;
+                    case 'ccy': 
+                        change = currentX - prevX;
+                        radius += change;
+                        if(radius<0){
+                            radius = radius*(-1);
                         }
-                       
+                        drawCircle(currentX,currentY,radius);
+                        break;
+                    case 'cc':
+                        change = currentX - prevX;
+                        radius += change;
+                        if(radius<0){
+                            radius = radius*(-1);
+                        }
+                        drawCircle(x,y,radius);
+                        break;
+                    case 'cd':
+                        change = currentX - prevX;
+                        radius += change;
+                        if(radius<0){
+                            radius = radius*(-1);
+                        }
+                        clearCircle(x,y,radius);
+                        drawCircle(x,y,radius);
+                        break;
                 }
             }
     }
@@ -288,7 +323,8 @@ $('document').ready(function(){
     function circleOn(){
         off();
         updateCurrentTool($(this));
-        type = 'c';
+        addToOptions('circle');
+        type = 'cd';
         shape = true;
     }
 // circle mode off
@@ -327,7 +363,32 @@ $('document').ready(function(){
             }
         }
         $('#toolOptions p').text('tool : '+currentTool);
-    } 
+    }
+   function addToOptions(caller){
+        var optionDiv = $('#toolOptions');
+        var tool;
+        switch(caller){
+            case "circle":
+                tool = "<select><option>default</option><option>cylinder</option><option>target</option></select>";
+                optionDiv.append(tool);
+                $('select').on('change',function(){
+                    var selected = $(this).val();
+                    switch(selected){
+                        case "cylinder":
+                            type = 'ccy';
+                            break;
+                        case "default":
+                            type = 'cd';
+                            break;
+                        case "target":
+                            type = 'cc';
+                            break;
+                    }
+                });
+
+
+        }
+   } 
     function bg(){  
         if(bgColor.length<=1){
             bgColor = "#ffffff";
