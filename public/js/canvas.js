@@ -30,10 +30,14 @@ $('document').ready(function(){
     var mouseClick = false;
 	var moving = false;
     var isFullScreen = false;
+    var shape = false;
+    
     var penSize = parseInt($('#pSize').text());
-	var penColor = "#000000";
+    var radius;
+    var penColor = "#000000";
     var prevPenColor = "#000000";       
     var bgColor = "#ffffff";
+    var currentTool = 'pen';
     var eraser = false;
     var text = false;
     var myString = "";
@@ -54,7 +58,7 @@ $('document').ready(function(){
     // 'enter' key to enter fullscreen or escape fullScreen
     
     $(document).keypress(function(e){
-       // console.log("which "+e.which+" keyCode "+e.keyCode+" window "+window.event.keyCode); 
+       console.log("which "+e.which+" keyCode "+e.keyCode+" window "+window.event.keyCode); 
 
             // + 
             if(e.which == 61 || e.keyCode == 61 || window.event.keyCode == 61){
@@ -69,11 +73,19 @@ $('document').ready(function(){
             // 2
             if(e.which == 50 || e.keyCode == 50 || window.event.keyCode == 50){
                 eraserOn();
+                updateCurrentTool($('p'),'eraser [2]');
             }
             
             // 1        
             if(e.which == 49 || e.keyCode == 49 || window.event.keyCode == 49){
                 eraserOff();
+                updateCurrentTool($('p'),'pen [1]');
+            }
+            
+            // t        
+            if(e.which == 116 || e.keyCode == 116 || window.event.keyCode == 116){
+                textOn();
+                updateCurrentTool($('p'),'text [t]');
             }
 
             // enter 
@@ -146,21 +158,21 @@ $('document').ready(function(){
 			prevY = currentY;
 		}else{
             //for mozilla e.offsetX is undefined
-            if(e.offsetX!=undefined){
+            if(e.offsetX != undefined){
                 prevX = e.offsetX;
                 prevY = e.offsetY;
             }else{
-                prevX= e.pageX-$('#canvas').offset().left;
-                prevY= e.pageY-$('#canvas').offset().top;
+                prevX = e.pageX-$('#canvas').offset().left;
+                prevY = e.pageY-$('#canvas').offset().top;
             }
 		}
         //for mozilla e.offsetX is undefined
-        if(e.offsetX!=undefined){
-            currentX= e.offsetX;
-            currentY= e.offsetY;
+        if(e.offsetX != undefined){
+            currentX = e.offsetX;
+            currentY = e.offsetY;
         }else{
-            currentX= e.pageX-$('#canvas').offset().left;
-            currentY= e.pageY-$('#canvas').offset().top;
+            currentX = e.pageX-$('#canvas').offset().left;
+            currentY = e.pageY-$('#canvas').offset().top;
         }
 	    
     }
@@ -181,7 +193,8 @@ $('document').ready(function(){
 			ctx.lineWidth = penRatio*(canvas.width*canvas.height);
 			ctx.stroke();
 			ctx.closePath();
-    } 
+    }
+
     function drawDrag(prevX,prevY,currX,currY,penSize){
             ctx.beginPath(); 
             ctx.moveTo(prevX, prevY);
@@ -190,45 +203,69 @@ $('document').ready(function(){
 			ctx.stroke();
 			ctx.closePath();
     } 
-    
+    function drawCircle(){ 
+            ctx.beginPath();
+            ctx.arc(currentX,currentY,radius,0,Math.PI*2);
+            ctx.stroke();
+    } 
     function drawStroke(){
         colorChange(penColor);
-		if(!text){
-
-        if(!moving){ 
-                drawClick(currentX,currentY,penSize);
-                justClickEmit();
-            }else{
-            drawDrag(prevX,prevY,currentX,currentY,penSize);
-            dragDrawEmit();
+		if(!text && !shape){
+            if(!moving){ 
+                    drawClick(currentX,currentY,penSize);
+                    justClickEmit();
+                }else{
+                drawDrag(prevX,prevY,currentX,currentY,penSize);
+                dragDrawEmit();
+                }
+            }else if(text && !moving){
+                    var font = "Georgia";
+                    ctx.font=penSize+"px "+font; 
+                    myString = prompt("Enter text");
+                    if(myString){
+                        ctx.fillText(myString,currentX,currentY);
+                        var textDetails = {
+                            "font":font,
+                            "penSize":penSize,
+                            "currentX":currentX,
+                            "currentY":currentY,
+                            "string":myString,
+                            "color":penColor,
+                            "room":myRoom
+                        }
+                        socket.emit('text', textDetails);
+                    } 
+            }else if(shape && !moving){
+                radius = penSize;
+                switch(type){
+                    case 'c':
+                        drawCircle();
+                        break;
+                }
+            }else if(shape && moving){
+                switch(type){
+                    case 'c':
+                        var change = currentX - prevX;
+                        radius+=change;
+                        if(radius>0){
+                             drawCircle();
+                        }else{
+                            radius = 0;
+                        }
+                       
+                }
             }
-        }else if(text&&!moving){
-                var font = "Georgia";
-                ctx.font=penSize+"px "+font; 
-                myString = prompt("Enter text");
-                if(myString){
-                    ctx.fillText(myString,currentX,currentY);
-                    var textDetails = {
-                        "font":font,
-                        "penSize":penSize,
-                        "currentX":currentX,
-                        "currentY":currentY,
-                        "string":myString,
-                        "color":penColor,
-                        "room":myRoom
-                    }
-                    socket.emit('text', textDetails);
-                } 
-        }
     }
     //off eraser text
     function off(){
        eraserOff();
        textOff();
+       circleOff();
    } 
 // In eraser mode
     function eraserOn(){
         off();
+        updateCurrentTool($(this));
         eraser = true;
         prevPenColor = penColor;
         penColor = bgColor; 
@@ -242,10 +279,22 @@ $('document').ready(function(){
     }
 // In text mode
     function textOn(){
+        off();
         type = 't';
+        updateCurrentTool($(this));
         text = true;    
     } 
-
+// circle mode on
+    function circleOn(){
+        off();
+        updateCurrentTool($(this));
+        type = 'c';
+        shape = true;
+    }
+// circle mode off
+    function circleOff(){
+        shape = false;
+    }
     function putText(){
         ctx.font=penSize+"px Georgia";
         myString = prompt("Enter text"); 
@@ -267,7 +316,18 @@ $('document').ready(function(){
             penColor = "#000000";
         }
     }
-    
+    function updateCurrentTool(btn,extra){
+        // function invoked on click
+        if(btn.is("button")){
+            currentTool = btn.text();
+        }else{
+            //function invoked on key press/other uses
+            if(extra){
+                currentTool = extra;       
+            }
+        }
+        $('#toolOptions p').text('tool : '+currentTool);
+    } 
     function bg(){  
         if(bgColor.length<=1){
             bgColor = "#ffffff";
@@ -384,8 +444,11 @@ $('document').ready(function(){
    
     // Input on the color change of background 
     $('#bgColorInp').on('change', bgColorChange);
-   
-    //Click on text
+
+    // Click on Circle tool
+    $('#circleTool').on('click',circleOn);
+
+    // Click on text
     $('#textTool').on('click', textOn);
 
     // Click on eraser
@@ -520,8 +583,7 @@ $('document').ready(function(){
     socket.on('error', function(data){
         console.log(data);
     });
-    socket.on('myRoom', function(room){
-        console.log(room);
+    socket.on('myRoom', function(room){ 
         myRoom = room;
     });
     socket.on('textEmit', function(data){

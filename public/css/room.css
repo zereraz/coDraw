@@ -171,3 +171,15 @@ button{
     color:#EF4F1D;
     border:1px solid #EF4F1D;
 }
+/*
+ *
+ * Tool Options
+ *
+ */
+#toolOptions{
+    width:100px;
+    color:#EF4F1D;
+    background:#343434;
+    border:1px solid #EF4F1D; 
+    padding:5px;
+}

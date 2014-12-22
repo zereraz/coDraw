@@ -2,7 +2,8 @@ extends index
 block content 
     div(id="options")
             button(id="clearCanvas") Clear Canvas
-            button(id="textTool") T
+            button(id="textTool") T [t]
+            button(id="circleTool") Circle
             a(id="downloadCanvasLink")
                 button(id="downloadCanvas") Download as Image
             div(id="penSz")
@@ -22,6 +23,8 @@ block content
     canvas(id="canvasBg", width="500", height="500")
     canvas(id="canvas", width="500", height="500")
     button(id="fullScreen") Full Screen
+    div(id="toolOptions")
+        p tool : pen [1]
     div(id="info")
         h3 Info
         p + key to Increase pensize
