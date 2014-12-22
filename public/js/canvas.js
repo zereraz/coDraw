@@ -59,7 +59,7 @@ $('document').ready(function(){
     // 'enter' key to enter fullscreen or escape fullScreen
     
     $(document).keypress(function(e){
-       console.log("which "+e.which+" keyCode "+e.keyCode+" window "+window.event.keyCode); 
+       //console.log("which "+e.which+" keyCode "+e.keyCode+" window "+window.event.keyCode); 
 
             // + 
             if(e.which == 61 || e.keyCode == 61 || window.event.keyCode == 61){
@@ -211,7 +211,7 @@ $('document').ready(function(){
 			ctx.closePath();
     }
    //drawing circle 
-    function drawCircle(currentX,currentY,radius){ 
+    function drawCircle(currentX,currentY,radius){
             ctx.beginPath();
             ctx.arc(currentX,currentY,radius,0,Math.PI*2);
             ctx.stroke();
@@ -259,25 +259,56 @@ $('document').ready(function(){
                         x = currentX;
                         y = currentY;
                         drawCircle(x,y,radius); 
+                        var circleData = {
+                            "type" : 'c',
+                            "centerX" : x,
+                            "centerY" : y,
+                            "radius" :penSize,
+                            "color":penColor,
+                            "room" : myRoom 
+                        }
+                        socket.emit('shape', circleData);
                         break;
                 }
             }else if(shape && moving){
                 switch(type){
-                    case 'ccy': 
+                    case 'cco': 
                         change = currentX - prevX;
                         radius += change;
                         if(radius<0){
                             radius = radius*(-1);
                         }
                         drawCircle(currentX,currentY,radius);
+
+                        var circleData = {
+                            "type" : type,
+                            "centerX" : currentX,
+                            "centerY" : currentY,
+                            "color" : penColor,
+                            "radius" : radius,
+                            "room" : myRoom
+                        }
+                        socket.emit('shape', circleData);
                         break;
-                    case 'cc':
+                    case 'ct':
                         change = currentX - prevX;
                         radius += change;
                         if(radius<0){
                             radius = radius*(-1);
                         }
                         drawCircle(x,y,radius);
+                        
+                        var circleData = {
+                            "type" : type,
+                            "centerX" : x,
+                            "centerY" : y,
+                            "currentX": currentX,
+                            "prevX" : prevX,
+                            "color":penColor,
+                            "radius" : radius,
+                            "room" : myRoom
+                        }
+                        socket.emit('shape', circleData);
                         break;
                     case 'cd':
                         change = currentX - prevX;
@@ -287,6 +318,16 @@ $('document').ready(function(){
                         }
                         clearCircle(x,y,radius);
                         drawCircle(x,y,radius);
+                        
+                        var circleData = {
+                            "type" : type,
+                            "centerX" : x,
+                            "centerY" : y,
+                            "radius" : radius,
+                            "color":penColor,
+                            "room" : myRoom
+                        }
+                        socket.emit('shape', circleData);
                         break;
                 }
             }
@@ -370,19 +411,19 @@ $('document').ready(function(){
         var tool;
         switch(caller){
             case "circle":
-                tool = "<select><option>default</option><option>cylinder</option><option>target</option></select>";
+                tool = "<select><option>default</option><option>cone</option><option>target</option></select>";
                 optionDiv.append(tool);
                 $('select').on('change',function(){
                     var selected = $(this).val();
                     switch(selected){
-                        case "cylinder":
-                            type = 'ccy';
+                        case "cone":
+                            type = 'cco';
                             break;
                         case "default":
                             type = 'cd';
                             break;
                         case "target":
-                            type = 'cc';
+                            type = 'ct';
                             break;
                     }
                 });
@@ -641,34 +682,68 @@ $('document').ready(function(){
     //
     // socket events
     //
-    
+
+
+    // on error    
     socket.on('error', function(data){
         console.log(data);
     });
+
+    // room sent to client 
     socket.on('myRoom', function(room){ 
         myRoom = room;
     });
+
+    // text sent to client
     socket.on('textEmit', function(data){
         ctx.font = data.penSize+"px "+data.font;
-        colorChange(data.color);        
-        console.log(ctx.font);
+        colorChange(data.color);
         ctx.fillText(data.string,data.currentX,data.currentY);
         colorChange(penColor); 
     });     
+
+    // click sent to client
     socket.on('drawClick', function(data){
         colorChange(data.penColor);
         drawClick(data.x,data.y,data.penSize);
         pen(); 
         colorChange(penColor);
     });
-
-    socket.on('drawDrag',function(data){ 
-        console.log(myRoom);
+    
+    // drag to client
+    socket.on('drawDrag',function(data){  
         colorChange(data.penColor);
         drawDragRatio(data.prevRatioX,data.prevRatioY,data.currRatioX,data.currRatioY,data.penRatio);        
         pen();
         colorChange(penColor);
     });
 
+    // when shape is sent to client
+    socket.on('shapeEmit', function(data){
+        colorChange(data.color);
+        var change;
+        switch(data.type[0]){
+            case 'c':
+                if('c' === data.type){
+                    drawCircle(data.centerX,data.centerY,data.radius);
+                }else{
+                    switch(data.type){
+                        case 'cd': 
+                                clearCircle(data.centerX,data.centerY,data.radius);
+                                drawCircle(data.centerX,data.centerY,data.radius);
+                           break;
+                        case 'cco':
+                                drawCircle(data.centerX,data.centerY,data.radius);
+                          break;
+                        case 'ct': 
+                                drawCircle(data.centerX,data.centerY,data.radius);
+                         break; 
+                    }
+                }
+                break;
+                
+            }
+        colorChange(penColor); 
+    });     
 });
 

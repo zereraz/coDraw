@@ -104,6 +104,10 @@ io.on('connection', function(socket){
         socket.on('text',function(textData){
             socket.broadcast.to(textData.room).emit('textEmit',textData); 
         });
+        socket.on('shape',function(shapeData){
+            console.log(shapeData);
+            socket.broadcast.to(shapeData.room).emit('shapeEmit',shapeData); 
+        });
     }else{
        //IDEA here room 0 where anyone can come, and draw
         io.sockets.emit('error','Problem resolving the roomId, Please rejoin');
