@@ -79,7 +79,7 @@ $('document').ready(function(){
             
             // 1        
             if(e.which == 49 || e.keyCode == 49 || window.event.keyCode == 49){
-                eraserOff();
+                off();
                 updateCurrentTool($('p'),'pen [1]');
             }
             
@@ -296,7 +296,7 @@ $('document').ready(function(){
        eraserOff();
        textOff();
        circleOff();
-   } 
+    } 
 // In eraser mode
     function eraserOn(){
         off();
@@ -329,6 +329,7 @@ $('document').ready(function(){
     }
 // circle mode off
     function circleOff(){
+        $('#toolOptions select').remove();
         shape = false;
     }
     function putText(){
