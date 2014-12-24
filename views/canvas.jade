@@ -1,25 +1,35 @@
 extends index
 block content 
     div(id="options")
-            button(id="clearCanvas") Clear Canvas
-            button(id="textTool") T [t]
-            button(id="circleTool") Circle [c]
+            button(id="clearCanvas",title="Clear Canvas")
+                img(src="/img/t_clear.png")
+            button(id="textTool",title="Text [t]")
+                img(src="/img/t_text.png")
+            button(id="brush",title="Brush [3]")
+                img(src="/img/t_brush.png")
+            button(id="eraser",title="Eraser [2]") 
+                img(src="/img/t_eraser.png")
+            button(id="pen",title="Pencil [1]")
+                img(src="/img/t_pencil.png")
+            button(id="circleTool",title="Circle [c]")
+                img(src="/img/t_circle.png")
             a(id="downloadCanvasLink")
-                button(id="downloadCanvas") Download as Image
+                button(id="downloadCanvas")
+                    img(src="/img/t_download.png")
             div(id="penSz")
                 h3(id="pSize") 5
                 button(id="inc") + [+]
                 button(id="dec") - [-]
-            div(id="pColor") 
+            button
+                div(id="pColor") 
             div(id="penColor") 
-                p pen color(hex) #
+                p pen color(hex) # <br>
                     input(class="color{pickerFaceColor:'transparent',pickerFace:3,pickerBorder:0,pickerInsetColor:'black'}", value="000000", id="pColorInp") 
             div(id="bColor") 
             div(id="bgColor") 
                 p background color(hex) #
                     input(class="color{pickerFaceColor:'transparent',pickerFace:3,pickerBorder:0,pickerInsetColor:'black'}", value="ffffff", id="bgColorInp") 
-            button(id="eraser") eraser [2]
-            button(id="pen") pen [1] 
+            input(id='lineWidth',class='optionInput',placeholder='line width')
     canvas(id="canvasBg", width="500", height="500")
     canvas(id="canvas", width="500", height="500")
     button(id="fullScreen") Full Screen
@@ -32,6 +42,7 @@ block content
         p 1 key for pen
         p 2 key for eraser
         p enter to enter/escape full screen
+        p c for circles   
     div(id="status")
         p People in room 1
     div(id="chatWindow")

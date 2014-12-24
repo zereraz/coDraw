@@ -23,7 +23,9 @@ $('document').ready(function(){
 
     // ImageData i.e Save
     var imageData;
+    // for enter key to send messages in chat
     var chatEnter = false;
+    var inputOptions = false;
     // room id
     var myRoom;
     // Flags
@@ -73,13 +75,13 @@ $('document').ready(function(){
             }
             
             // 2
-            if(e.which == 50 || e.keyCode == 50){
+            if((e.which == 50 || e.keyCode == 50) && !inputOptions){
                 eraserOn();
                 updateCurrentTool($('p'),'eraser [2]');
             }
             
             // 1        
-            if(e.which == 49 || e.keyCode == 49){
+            if((e.which == 49 || e.keyCode == 49) && !inputOptions){
                 off();
                 updateCurrentTool($('p'),'pen [1]');
             }
@@ -215,12 +217,13 @@ $('document').ready(function(){
     }
    //drawing circle 
     function drawCircle(currentX,currentY,radius){
-            var temp = ctx.lineWidth;
+           /* var temp = ctx.lineWidth;
             ctx.lineWidth = 1;
+            */
             ctx.beginPath();
             ctx.arc(currentX,currentY,radius,0,Math.PI*2);
             ctx.stroke();
-            ctx.lineWidth = temp;
+           
     }
     var clearCircle = function(x, y, radius){
         ctx.save();
@@ -417,7 +420,7 @@ $('document').ready(function(){
         var tool;
         switch(caller){
             case "circle":
-                tool = "<select><option>default</option><option>cone</option><option>target</option></select><input class='optionInput' placeholder='lineWidth'/>";
+                tool = "<select><option>default</option><option>cone</option><option>target</option></select>";
                 optionDiv.append(tool);
                 $('select').on('change',function(){
                     var selected = $(this).val();
@@ -571,6 +574,20 @@ $('document').ready(function(){
         ctx.clearRect(0,0,canvas.width,canvas.height); 
     });
 
+    // Linewidth change
+    $('#lineWidth').on('change',function(){
+        var lineWidth = parseInt($(this).val());
+        ctx.lineWidth = lineWidth; 
+
+    });
+
+    $('#lineWidth').on('focusin',function(){
+        inputOptions = true;
+    });
+
+    $('#lineWidth').on('focusout',function(){
+        inputOptions = false; 
+    });
     // Full Screen
     $('#fullScreen').on('click', function(){
         if(!isFullScreen){
@@ -584,6 +601,9 @@ $('document').ready(function(){
     //Download the canvas
     $('#downloadCanvasLink').on('click',function(){
         var name = prompt("Name of image"); 
+        if(name==null){
+            return false;
+        }
         this.href = document.getElementById('canvas').toDataURL();
         this.download = name;
     });
