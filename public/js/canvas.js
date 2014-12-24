@@ -23,7 +23,7 @@ $('document').ready(function(){
 
     // ImageData i.e Save
     var imageData;
-
+    var chatEnter = false;
     // room id
     var myRoom;
     // Flags
@@ -34,7 +34,7 @@ $('document').ready(function(){
     // circle on click
     var x,y;    
     var penSize = parseInt($('#pSize').text());
-    var radius;
+    var radius = penSize;
     var penColor = "#000000";
     var prevPenColor = "#000000";       
     var bgColor = "#ffffff";
@@ -97,10 +97,12 @@ $('document').ready(function(){
 
             // enter 
             if(e.which == 13 || e.keyCode == 13 || window.event.keyCode == 13){
-                if(!isFullScreen){
-                    fullScreen();
-                }else{
-                    endFullScreen();     
+                if(!chatEnter){
+                    if(!isFullScreen){
+                        fullScreen();
+                    }else{
+                        endFullScreen();     
+                    }
                 }
             } 
         });
@@ -581,6 +583,46 @@ $('document').ready(function(){
         this.href = document.getElementById('canvas').toDataURL();
         this.download = name;
     });
+
+
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ %
+ %
+ %  Chat Part
+ %
+ %
+ %
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+
+//
+// Click send
+//
+
+    $('form').on('submit',function(){
+        var message = $('#reply').val();
+        
+        if(message.length>0){
+           $('#messages').append('<li class="mySent">'+message+'<hr></li>');
+            var chatData = {
+                'message':message,
+                'room':myRoom,
+                'user':'saheb'
+            };
+            socket.emit('messageSent',chatData);
+            $('#chatWindow').animate({scrollTop:$('#chatWindow').width()},1000);
+            $('#reply').val('');
+        }
+        chatEnter = true;
+        return false;
+    });
+    $('#reply').focusin(function(){
+        chatEnter = true;
+    });
+    $('#reply').focusout(function(){
+        chatEnter = false;
+    });
+
     // Undo
 /*    $('#undo').on('click',function(){ 
         eraserOn();
@@ -663,7 +705,7 @@ $('document').ready(function(){
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
     }
-   /* 
+/* 
     function undo(){
         eraserOn();
         penColor = bgColor;
@@ -745,5 +787,10 @@ $('document').ready(function(){
             }
         colorChange(penColor); 
     });     
+
+    socket.on('messageReceived', function(data){
+        $('#messages').append('<li class="otherSent">'+data.message+"<br>~ "+data.user+'<hr></li>');
+        $('#chatWindow').animate({scrollTop:$('#chatWindow').width()},1000);
+    });
 });
 

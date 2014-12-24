@@ -18,6 +18,11 @@ it uses socket.io
     - Pen
     - Eraser
     - Text
+    - Shapes
+        - Circle
+            - default
+            - cone
+            - target
  - Pen Size
  - Full Screen mode
  - Color Picker

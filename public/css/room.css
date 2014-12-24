@@ -12,7 +12,6 @@ canvas{
     position:absolute;
     top:50px;
     left:35%;
-    float:right;
     display:block;
 }
 /*
@@ -183,3 +182,53 @@ button{
     padding:5px;
     float:right;
 }
+
+/*
+ *
+ * Chat Window
+ *
+ */
+#chatWindow{
+    position:absolute;
+    top:54%;
+    padding:10px;
+    height:40%;
+    right:10px;
+    color:#EF4F1D;
+    background:#343434;
+    border:1px solid #EF4F1D; 
+    width:28%;
+    overflow:scroll;
+}
+#replyWindow{
+    padding:10px;
+    position:fixed;
+    width:20%;
+    bottom:20px;
+}
+#reply{
+    width:90%;
+    border:0;
+}
+
+#send{
+    position:absolute;
+    right:0px;
+    color:#EF4F1D;
+    background:#343434;
+    border:1px solid #EF4F1D; 
+}
+.mySent{
+    background-color:#343434;
+    color:#EF4F1D;
+    word-wrap: break-word;
+}
+.otherSent{   
+    background-color:#343434;
+    word-wrap: break-word;
+}
+#messages{
+    list-style-type: none; margin: 0; padding: 0; 
+}
+
+

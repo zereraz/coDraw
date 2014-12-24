@@ -104,9 +104,16 @@ io.on('connection', function(socket){
         socket.on('text',function(textData){
             socket.broadcast.to(textData.room).emit('textEmit',textData); 
         });
-        socket.on('shape',function(shapeData){
-            console.log(shapeData);
+        socket.on('shape',function(shapeData){ 
             socket.broadcast.to(shapeData.room).emit('shapeEmit',shapeData); 
+        });
+        /*%%%%%%%%%%%%%%%%%%%%%%
+         *
+         *  Chat Application
+         *
+         *%%%%%%%%%%%%%%%%%%%%%%*/
+        socket.on('messageSent', function (chatData){
+            socket.broadcast.to(chatData.room).emit('messageReceived',chatData);
         });
     }else{
        //IDEA here room 0 where anyone can come, and draw
