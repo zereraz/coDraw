@@ -46,7 +46,7 @@ $('document').ready(function(){
     var undo = []; 
     // redo
     var redo = [];
-    var username;
+    var username = 0;
 
     //
     // keyboard events
@@ -602,17 +602,20 @@ $('document').ready(function(){
 
     $('form').on('submit',function(){
         var message = $('#reply').val();
-        
-        if(message.length>0){
-           $('#messages').append('<li class="mySent">'+message+'<hr></li>');
-            var chatData = {
-                'message':message,
-                'room':myRoom,
-                'user':username
-            };
-            socket.emit('messageSent',chatData);
-            $('#chatWindow').animate({scrollTop:$('#chatWindow').width()},1000);
-            $('#reply').val('');
+        if(username!=0){
+            if(message.length>0){
+               $('#messages').append('<li class="mySent">'+message+'<hr></li>');
+                var chatData = {
+                    'message':message,
+                    'room':myRoom,
+                    'user':username
+                };
+                socket.emit('messageSent',chatData);
+                $('#chatWindow').animate({scrollTop:$('#chatWindow').width()},1000);
+                $('#reply').val('');
+            }
+        }else{
+            $('.error').html('<p>username not defined</p>');
         }
         chatEnter = true;
         return false;

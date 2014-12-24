@@ -31,6 +31,7 @@ it uses socket.io
  - Clear Screen
  - Download Image drawn
  - Shortcut Keys
+ - Group chat available
 
 ### Install
 
