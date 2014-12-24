@@ -35,8 +35,13 @@ block content
     div(id="status")
         p People in room 1
     div(id="chatWindow")
+        h4 chat window
+        form(action="",id="sendUser")
+            input(id="username",placeholder="username")
+            input(type="submit",class="btn", value="send")
+            p(class='error') 
         ul(id="messages")
         div(id="replyWindow")
-            form(action="")
+            form(id="messageForm",action="")
                 input(id="reply",autocomplete="off")
                 input(type="submit",id="send", value="send") 

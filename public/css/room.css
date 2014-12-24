@@ -201,6 +201,7 @@ button{
     overflow:scroll;
 }
 #replyWindow{
+    display:none;
     padding:10px;
     position:fixed;
     width:20%;
@@ -214,6 +215,12 @@ button{
 #send{
     position:absolute;
     right:0px;
+    color:#EF4F1D;
+    background:#343434;
+    border:1px solid #EF4F1D; 
+}
+
+.btn{
     color:#EF4F1D;
     background:#343434;
     border:1px solid #EF4F1D; 

@@ -46,6 +46,7 @@ $('document').ready(function(){
     var undo = []; 
     // redo
     var redo = [];
+    var username;
 
     //
     // keyboard events
@@ -607,7 +608,7 @@ $('document').ready(function(){
             var chatData = {
                 'message':message,
                 'room':myRoom,
-                'user':'saheb'
+                'user':username
             };
             socket.emit('messageSent',chatData);
             $('#chatWindow').animate({scrollTop:$('#chatWindow').width()},1000);
@@ -622,7 +623,20 @@ $('document').ready(function(){
     $('#reply').focusout(function(){
         chatEnter = false;
     });
-
+    $('#username').focusin(function(){
+        chatEnter = true;
+    });
+    $('#sendUser').submit(function(){
+        username = $('#username').val();
+        if(username.length>0){
+            $(this).remove();
+            $('#replyWindow').css('display','inherit');
+            chatEnter = false;
+        }else{
+            $('.error').html('<p> no username added</p>');
+        }
+        return false;
+    });
     // Undo
 /*    $('#undo').on('click',function(){ 
         eraserOn();
