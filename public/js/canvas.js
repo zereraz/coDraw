@@ -634,6 +634,8 @@ $('document').ready(function(){
                     'user':username
                 };
                 socket.emit('messageSent',chatData);
+                console.log($('#chatWindow').width());
+                console.log($('#messages').width());
                 $('#chatWindow').animate({scrollTop:$('#chatWindow').width()},1000);
                 $('#reply').val('');
             }
