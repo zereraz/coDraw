@@ -634,9 +634,13 @@ $('document').ready(function(){
                     'user':username
                 };
                 socket.emit('messageSent',chatData);
-                console.log($('#chatWindow').width());
-                console.log($('#messages').width());
-                $('#chatWindow').animate({scrollTop:$('#chatWindow').width()},1000);
+                var height = 0;
+                $('#messages li').each(function(i, value){
+                    height += parseInt($(this).height());
+                });
+
+                height += ''; 
+                $('#chatWindow').animate({scrollTop:height},0);
                 $('#reply').val('');
             }
         }else{
@@ -832,7 +836,12 @@ $('document').ready(function(){
 
     socket.on('messageReceived', function(data){
         $('#messages').append('<li class="otherSent">'+data.message+"<br>~ "+data.user+'<hr></li>');
-        $('#chatWindow').animate({scrollTop:$('#chatWindow').width()},1000);
-    });
+        var height = 0;
+        $('#messages li').each(function(i, value){
+            height += parseInt($(this).height());
+        });
+        height += '';
+       
+        $('#chatWindow').animate({scrollTop:height},0);
 });
-
+});
