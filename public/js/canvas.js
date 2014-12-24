@@ -63,41 +63,41 @@ $('document').ready(function(){
        //console.log("which "+e.which+" keyCode "+e.keyCode+" window "+window.event.keyCode); 
 
             // + 
-            if(e.which == 61 || e.keyCode == 61 || window.event.keyCode == 61){
+            if(e.which == 61 || e.keyCode == 61){
                 incPenSize();
             }
             
             // -     
-            if(e.which == 45 || e.keyCode == 45 || window.event.keyCode == 45){
+            if(e.which == 45 || e.keyCode == 45){
                 decPenSize();
             }
             
             // 2
-            if(e.which == 50 || e.keyCode == 50 || window.event.keyCode == 50){
+            if(e.which == 50 || e.keyCode == 50){
                 eraserOn();
                 updateCurrentTool($('p'),'eraser [2]');
             }
             
             // 1        
-            if(e.which == 49 || e.keyCode == 49 || window.event.keyCode == 49){
+            if(e.which == 49 || e.keyCode == 49){
                 off();
                 updateCurrentTool($('p'),'pen [1]');
             }
             
             // t        
-            if(e.which == 116 || e.keyCode == 116 || window.event.keyCode == 116){
+            if(e.which == 116 || e.keyCode == 116){
                 textOn();
                 updateCurrentTool($('p'),'text [t]');
             }
             
             // c        
-            if(e.which == 99 || e.keyCode == 99 || window.event.keyCode == 99){
+            if(e.which == 99 || e.keyCode == 99){
                 circleOn();
                 updateCurrentTool($('p'),'Circle [c]');
             }
 
             // enter 
-            if(e.which == 13 || e.keyCode == 13 || window.event.keyCode == 13){
+            if(e.which == 13 || e.keyCode == 13){
                 if(!chatEnter){
                     if(!isFullScreen){
                         fullScreen();
@@ -215,9 +215,12 @@ $('document').ready(function(){
     }
    //drawing circle 
     function drawCircle(currentX,currentY,radius){
+            var temp = ctx.lineWidth;
+            ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.arc(currentX,currentY,radius,0,Math.PI*2);
             ctx.stroke();
+            ctx.lineWidth = temp;
     }
     var clearCircle = function(x, y, radius){
         ctx.save();
@@ -414,7 +417,7 @@ $('document').ready(function(){
         var tool;
         switch(caller){
             case "circle":
-                tool = "<select><option>default</option><option>cone</option><option>target</option></select>";
+                tool = "<select><option>default</option><option>cone</option><option>target</option></select><input class='optionInput' placeholder='lineWidth'/>";
                 optionDiv.append(tool);
                 $('select').on('change',function(){
                     var selected = $(this).val();
@@ -600,8 +603,8 @@ $('document').ready(function(){
 // Click send
 //
 
-    $('form').on('submit',function(){
-        var message = $('#reply').val();
+    $('#messageForm').on('submit',function(){
+        var message = $('#reply').val(); 
         if(username!=0){
             if(message.length>0){
                $('#messages').append('<li class="mySent">'+message+'<hr></li>');

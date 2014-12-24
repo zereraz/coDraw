@@ -183,6 +183,11 @@ button{
     float:right;
 }
 
+.optionInput{
+    width:70px; 
+    border:1px solid #EF4F1D; 
+}
+
 /*
  *
  * Chat Window
