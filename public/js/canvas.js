@@ -15,7 +15,7 @@ $('document').ready(function(){
 
     // Current position of mouse
 	var currentX;
-	var currentY;
+	var currentY;  
 
     // Previous position of mouse
 	var prevX;
@@ -49,6 +49,7 @@ $('document').ready(function(){
     // redo
     var redo = [];
     var username = 0;
+    var myName;
 
     //
     // keyboard events
@@ -777,11 +778,31 @@ $('document').ready(function(){
         console.log(data);
     });
 
-    // room sent to client 
-    socket.on('myRoom', function(room){ 
-        myRoom = room;
+
+
+    // roomOccupants updated to client 
+    socket.on('roomOccupants', function(names){ 
+    	var s = 'People in room#'+myRoom+' : [ ';
+    	for (var i = 0; i<names.length; i++) {
+    		s += name[i];
+    		if(names[i] == myName)
+    			s+='(ME)';
+    		if(i!=names.length-1)
+    			s += ' ,';
+    	};
+        $('#status').text(s+' ]');
     });
 
+  // name sent to client 
+    socket.on('myName', function(name){ 
+        myName = name;
+    });
+
+    // room sent to client 
+    socket.on('namesInRoom', function(room){ 
+        myRoom = room;
+    });
+ 
     // text sent to client
     socket.on('textEmit', function(data){
         ctx.font = data.penSize+"px "+data.font;

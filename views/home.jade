@@ -1,12 +1,18 @@
 extends index2
 block content
     div(id="rooms")
-        form(action="/createroom", method="post")
-            label Create a room, enter roomId
-            input(name="roomId",placeholder="   roomId",type="text",class="inp")
-            input(type="submit",class="sub")
+        
+        input(id="uname1",name="uname",placeholder="   uname",type="text",class="inp")
 
-        form(action="/joinroom", method="post")
-            label Join a room, enter roomId
-            input(name="roomId",placeholder="   roomId",type="text",class="inp")
-            input(type="submit",class="sub")
+        form(id="form1",action="/createroom", method="post")
+            label Create a room
+            input(id="uname2",name="uname",placeholder="   uname",type="hidden",class="inp")
+            input(id="roomId1",name="roomId",placeholder="   roomId",type="text",class="inp")
+            
+
+        form(id="form2",action="/joinroom", method="post")
+            label Rooms online
+            input(id="uname3",name="uname",placeholder="   uname",type="hidden",class="inp")
+            input(id="roomId2",name="roomId",placeholder="   roomId",type="hidden",class="inp")
+            
+        span(id="joinButtons")
