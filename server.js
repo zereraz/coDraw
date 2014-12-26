@@ -21,6 +21,9 @@ var room = require('./routes/room');
 var activeConnections = 0;
 var myRoom = 0;
 
+
+var myName = "";
+
 /*==========================
  *
  * 	MIDDLEWARE
@@ -78,16 +81,27 @@ app.get('/port',function(req,res){
 ==========================*/
 
 io.on('connection', function(socket){
-    myRoom = room.getRoom();
-    if(myRoom!=0){
-        myRoom = room.getRoom();
-        socket.join(myRoom);
-        io.sockets.to(myRoom).emit('myRoom',myRoom);
     
+    myRoom = room.getRoom();
+    if(myRoom!=0){ 
+
+    	myName = room.getName();
+    	var rooms = room.getRooms();
+    	var namesInMyRoom = room.getNamesInMyRooms(myRoom);
+        socket.join(myRoom);
+
+
+        console.log(rooms);
+        console.log(namesInMyRoom);
+
+        io.sockets.to(myRoom).emit('myRoom',myRoom);
+        io.sockets.to(myRoom).emit('myName',myName);
+    	io.sockets.to(myRoom).emit('roomOccupants',namesInMyRoom);
+
         io.sockets.on('disconnect', function(){
             activeConnections--;
             io.sockets.emit('userDisconnected',activeConnections);
-            room.pop(myRoom);
+            room.pop(myRoom,myName);
             socket.leave(myRoom);
         });
         io.sockets.in(myRoom).emit('roomPopulation',activeConnections);
@@ -107,6 +121,21 @@ io.on('connection', function(socket){
         socket.on('shape',function(shapeData){ 
             socket.broadcast.to(shapeData.room).emit('shapeEmit',shapeData); 
         });
+
+        socket.on('requestAvailableRooms',function(a){ 
+            socket.emit('availableRooms',rooms); 
+        });
+
+        socket.on('requestNamesInRoom',function(room){ 
+	    	var n= room.getNamesInMyRooms(room);
+            socket.emit('namesInRoom',n);   
+        });
+
+        socket.on('createRoomChecker',function(roomId){
+        	var n= rooms.indexOf(roomId);
+            socket.emit('createRoomPass', n);
+        });
+
         /*%%%%%%%%%%%%%%%%%%%%%%
          *
          *  Chat Application
