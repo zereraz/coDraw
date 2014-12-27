@@ -1,5 +1,187 @@
 $('document').ready(function(){
 
+    var anyCloseLeft = $('.closeLeft');
+    var anyCloseRight = $('.closeRight');
+    var expandOrCollapse = $('#fullScreen');
+    var allCanvas = $('canvas');    
+    var canvas = document.getElementById('canvas');
+    var canvasBg = document.getElementById('canvasBg');
+    //original canvas width
+
+    // BOOL
+    // if all divs collapsed
+    var allCollapsed = false;
+
+    // events
+
+/*    optionClose.on('click',onCloseClick);
+    function onCloseClick(){
+        var width = $(this).parent().width()-10;
+        if(!optionClosed){
+            options.animate({"left":"-="+width+'px'},200);
+            optionClosed = true;
+        }else{
+            options.animate({"left":"+="+width+'px'},200);
+            optionClosed = false;
+        }
+    }
+*/
+    //generic left close
+    anyCloseLeft.on('click', onLeftCloseClick);
+
+    //generic right close
+    anyCloseRight.on('click', onRightCloseClick);
+
+    // expand or collapse all
+/*    expandOrCollapse.on('click', function(){
+        if(!allCollapsed){
+            collapseAll();
+            fullScreen(); 
+            allCollapsed = true;
+        }else{
+            expandAll();
+            endFullScreen();
+            allCollapsed = false;
+        }
+    });
+*/
+
+    // event handlers
+    
+    //generic close left
+    function onLeftCloseClick(){
+        var parent = $(this).parent();
+        var parentWidth = parent.width()-10;
+        var parentLeft = parent.css('left');
+        if(parentLeft=='0px'){
+            if($(this).text()=='<-'){
+                collapseThis(parent,"left",parentWidth,$(this));
+                $(this).text('->');
+            }
+        }else{
+            if($(this).text()=='->'){
+                expandThis(parent,"left",parentWidth,$(this));
+                $(this).text('<-');
+            }
+        }
+    }
+    //generic close right
+
+    function onRightCloseClick(){
+        var parent = $(this).parent();     
+        var parentWidth = parent.width()-10;
+        var parentRight = parent.css('right');
+        if(parentRight=='0px'){
+                if($(this).text()=='->'){
+                    collapseThis(parent,"right",parentWidth,$(this)); 
+                }
+            }else{
+                if($(this).text()=='<-'){
+                    expandThis(parent,"right",parentWidth,$(this));
+                }
+            }
+    }
+
+    //Helper functions
+    
+    function collapseThis(elem,direction,width,child){
+        if(direction == "left"){
+                if(child.text()=='<-'){
+                    elem.animate({"left":"-="+width+'px'},200);
+                    elem.hide(200);
+                    child.text('->');
+                }
+            }else{
+                if(child.text()=='->'){
+
+                    elem.animate({"right":"-="+width+'px'},200);
+                    elem.hide(200);
+                    child.text('<-');
+                    
+                }
+            }
+        }
+
+        function expandThis(elem,direction,width,child){
+            if(direction == "left"){
+                if(child.text()=='->'){
+                    elem.animate({"left":"+="+width+'px'},200);
+                    elem.show(200);
+                    child.text('<-');
+                }
+            }else{
+                if(child.text()=='<-'){
+                    elem.animate({"right":"+="+width+'px'},200);
+                    elem.show(200);
+                    child.text('->');
+                }
+        }
+    }
+    function collapseAll(){
+        var leftElems = $('.closeLeft');
+        var rightElems = $('.closeRight'); 
+        for(var i=0;i<leftElems.length;i++){ 
+            var elem = $(leftElems[i]);
+            var parent = elem.parent();
+            var parentWidth = parent.width()-10;
+            var parentLeft = parent.css('left');
+            collapseThis(parent,"left",parentWidth,elem);
+        }
+
+        for(var i=0;i<rightElems.length;i++){ 
+            var elem = $(rightElems[i]);
+            var parent = elem.parent();
+            var parentWidth = parent.width()-10;
+            var parentLeft = parent.css('right');
+            collapseThis(parent,"right",parentWidth,elem);
+        }
+    }
+
+    function expandAll(){
+        var leftElems = $('.closeLeft');
+        var rightElems = $('.closeRight'); 
+        for(var i=0;i<leftElems.length;i++){ 
+            var elem = $(leftElems[i]);
+            var parent = elem.parent();
+            var parentWidth = parent.width()-10;
+            var parentLeft = parent.css('left');
+            expandThis(parent,"left",parentWidth,elem);
+        }
+
+        for(var i=0;i<rightElems.length;i++){ 
+            var elem = $(rightElems[i]);
+            var parent = elem.parent();
+            var parentWidth = parent.width()-10;
+            var parentLeft = parent.css('right');
+            expandThis(parent,"right",parentWidth,elem);
+        }
+    }
+
+
+    //expand canvas when all else is collapsed
+    function changeCanvasSize(width,height){
+        canvas.width = width;
+        canvasBg.width = width;
+        canvas.height = height;
+        canvasBg.height = height;
+    }
+
+    function expandCanvas(){
+        var width = $(window).width();
+        var height = $(window).height();
+        changeCanvasSize(width,height);
+        for(var i=0;i<allCanvas.length;i++){
+            var canvas = $(allCanvas[i]);
+            canvas.animate({'left':'0px'},200);
+        }
+    }
+    function collapseCanvas(){ 
+        changeCanvasSize(width,height);
+        for(var i=0;i<allCanvas.length;i++){
+            var canvas = $(allCanvas[i]);
+            canvas.animate({'left':'15%'},200);
+        }
+    }
 	var canvas;
     var canvasBg;    
     // Context
@@ -143,8 +325,12 @@ $('document').ready(function(){
 
 	function init(){
         canvas = document.getElementById('canvas'); 
-		ctx = canvas.getContext('2d');
+		canvas.width = $(window).width()*0.5;
+		canvas.height= $(window).height()*0.5;
+        ctx = canvas.getContext('2d');
 		canvasBg = document.getElementById('canvasBg');
+		canvasBg.width = $(window).width()*0.5;
+		canvasBg.height= $(window).height()*0.5;
         ctxBg = canvasBg.getContext('2d'); 
         ctxBg.fillStyle = bgColor;
         ctxBg.fillRect(0,0,canvas.width,canvas.height);
@@ -699,7 +885,11 @@ $('document').ready(function(){
 
     // Decrease Pen Size 
     function decPenSize(){
-        penSize -=1;
+        if(penSize>0){
+            penSize -=1;
+        }else{
+            penSize = 0;
+        }
         $('#pSize').text(penSize);
         $('#pColor').css({width:penSize,height:penSize});
     }
@@ -723,6 +913,8 @@ $('document').ready(function(){
     }
     // Fullscreen for canvas
     function fullScreen(){
+        collapseAll();
+        $('#status').css('display','none'); 
         isFullScreen = true;
         imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
         canvas.width = $(window).width();
@@ -738,16 +930,23 @@ $('document').ready(function(){
     }
     // exit from full screen
     function endFullScreen(){
-        $('#canvas').css('left','35%');
-        $('#canvasBg').css('left','35%');
-        imageData = ctx.getImageData(0,0,$(window).width(),$(window).height()); 
+        expandAll();
+        $('#status').css('display','inline');
+        $('#canvas').css('left','15%');
+        $('#canvasBg').css('left','15%');
+        imageData = ctx.getImageData(0,0,$(window).width(),$(window).height());
+        var ratioX = $(window).width()/width;
+        var ratioY = $(window).height()/height;
         isFullScreen = false;
+        //canvas back to original size
         canvas.width = width;
-        canvas.height = height; 
-        canvasBg.width = width; 
+        canvas.height = height;
+        //background back to original size
+        canvasBg.width = width;
         canvasBg.height = height;
+        //ctx.scale(1/ratioX,1/ratioY);
         ctx.putImageData(imageData,0,0);
-        bg();  
+        bg();
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
     }
