@@ -20,6 +20,7 @@ var index = require('./routes/index');
 var room = require('./routes/room');
 var activeConnections = 0;
 var myRoom = 0;
+var roomLord = {};
 
 /*==========================
  *
@@ -55,21 +56,21 @@ app.set('views',__dirname+'/views');
  *
 ==========================*/
 
-//root
-app.get('/',index.root);
-/*app.get('/', function(req,res){
-    res.render('canvas');
-});
-*/
-//room
-app.get('/room', room.getRoom);
-app.post('/createroom', room.pCreateRoom);
-app.post('/joinroom', room.pJoinRoom);
+//root , home page
 
-//port
+app.get('/',index.home);
+
+
+//room , drawing area
+app.get('/room',room.gRoom);
+app.post('/room',room.pRoom);
+app.get('/usercheck',room.userCheck);
+
+//port, to get port where heroku app is hosted
 app.get('/port',function(req,res){
-    res.send("port is "+port); 
+    res.send(port);
 });
+
 
 /*==========================
  *
@@ -79,16 +80,37 @@ app.get('/port',function(req,res){
 
 io.on('connection', function(socket){
     myRoom = room.getRoom();
-    if(myRoom!=0){
-        myRoom = room.getRoom();
+    if(myRoom !== 0){
+        
+        userName = room.getUser();
+        if(roomLord[myRoom] === undefined){
+            var idToUser = {};
+            idToUser[socket.id] = userName;
+            roomLord[myRoom] = {users:1,userList:[idToUser]};
+        }else{
+            var idToUser = {};
+            idToUser[socket.id] = userName;
+            roomLord[myRoom].users += 1;
+            roomLord[myRoom].userList.push(idToUser);
+            
+        }
+        
         socket.join(myRoom);
-        io.sockets.to(myRoom).emit('myRoom',myRoom);
-    
-        io.sockets.on('disconnect', function(){
-            activeConnections--;
-            io.sockets.emit('userDisconnected',activeConnections);
-            room.pop(myRoom);
-            socket.leave(myRoom);
+        
+        var status = {
+            "room":myRoom,
+            'id':roomLord[myRoom].users,
+            'username':userName,
+            'users':roomLord[myRoom].users,
+            'sid':socket.id
+        };
+        
+        socket.emit('status',status);        
+        socket.on('join', function(myStatus){
+            
+            // This is a new user that got status
+            // Now we have to update everyone in that room's users
+            socket.emit('updateUsers',"inc");
         });
         io.sockets.in(myRoom).emit('roomPopulation',activeConnections);
             activeConnections++;
@@ -107,11 +129,13 @@ io.on('connection', function(socket){
         socket.on('shape',function(shapeData){ 
             socket.broadcast.to(shapeData.room).emit('shapeEmit',shapeData); 
         });
+
         /*%%%%%%%%%%%%%%%%%%%%%%
          *
          *  Chat Application
          *
          *%%%%%%%%%%%%%%%%%%%%%%*/
+        
         socket.on('messageSent', function (chatData){
             socket.broadcast.to(chatData.room).emit('messageReceived',chatData);
         });
@@ -119,20 +143,12 @@ io.on('connection', function(socket){
        //IDEA here room 0 where anyone can come, and draw
         io.sockets.emit('error','Problem resolving the roomId, Please rejoin');
     }
-    /*
-	io.sockets.emit('userconnect', activeConnections);
-	socket.on('disconnect', function(){
-		activeConnections--;
-		io.sockets.emit('userdisconnet', activeConnections);
-	});
-	socket.on('drawprogress', function(uid, co_ordinates){
-		io.sockets.emit('drawprogress', uid, co_ordinates);
-	});
-	socket.on('drawend', function(uid, co_ordinates){
-		io.sockets.emit('drawend', uid, co_ordinates);
-	});
-*/
 
+        socket.on('disconnect', function(){
+            activeConnections--;
+            
+            io.sockets.emit('userDisconnected',activeConnections);
+        });
 
 });
 

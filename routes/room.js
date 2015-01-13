@@ -1,49 +1,49 @@
-var myRoom = 0;
-var rooms = [];
-exports.getRoom = function(req, res){
+var roomId;
+var userName;
+var roomLord = {};
 
-	if(req.session.roomId !== undefined){
-		res.render('canvas');
-	}else{
-	
-		res.redirect('/');
-	}
-}
+// Get room.jade
+exports.gRoom = function(req,res){
+    res.render('canvas');
+};
 
+// Get roomId
 exports.getRoom = function(){
-    return myRoom;
-}
+    return roomId;
+};
 
-exports.pop = function(room){
-    var i = rooms.indexOf(room);
-    if(i>-1){
-        rooms.splice(i,1);
-    }
+// Get the username
+exports.getUser = function(){
+    return userName;
+};
 
-}
-
-exports.pCreateRoom = function(req, res){
-
-	var roomId = req.body.roomId;
-    if(rooms.indexOf(roomId)==-1){
-        rooms.push(roomId);    
-        req.session.roomId = roomId;
-        myRoom = roomId;
-        res.render("canvas");
+exports.userCheck = function(req,res){
+    var user = req.query.username;
+    var room = req.query.room;
+    if(roomLord[room]!==undefined){
+        if(roomLord[room].userList.indexOf(user)!==-1){
+            res.send('-1');
+        }else{
+            res.send('1');
+        }
     }else{
-        res.send("Room not available");
+        res.send('1');
     }
-	
-}
+};
 
-exports.pJoinRoom = function(req, res){
-    var roomId = req.body.roomId;
-    if(rooms.indexOf(roomId)!=-1){
-        req.session.roomId = roomId;
-        myRoom = roomId;
-        res.render("canvas");
+// Post from home.jade
+exports.pRoom = function(req,res){
+
+    userName = req.body.uname;
+    roomId = req.body.roomId;
+
+    if(roomLord[roomId]===undefined){
+        roomLord[roomId] = {users:1,userList:[userName]};
     }else{
-        res.send("Room does not exist, Please create one to join");
+        roomLord[roomId].users += 1;
+        if(roomLord[roomId].userList.indexOf(userName)===-1){
+            roomLord[roomId].userList.push(userName);
+        }
     }
-
-}
+    res.render('canvas');
+};

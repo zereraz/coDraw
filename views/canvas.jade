@@ -1,8 +1,6 @@
 extends index
 block content 
-div(class="main_body_container")
         div(id="options")
-                button(class="closeLeft") <-
                 button(id="clearCanvas",title="Clear Canvas")
                     img(src="/img/t_clear.png")
                 button(id="textTool",title="Text [t]")
@@ -34,13 +32,12 @@ div(class="main_body_container")
                         input(class="color{pickerFaceColor:'transparent',pickerFace:3,pickerBorder:0,pickerInsetColor:'black'}", value="ffffff", id="bgColorInp") 
                 input(id='lineWidth',class='optionInput',placeholder='   line width')
         canvas(id="canvasBg")
+            Your browser does not support canvas element.
         canvas(id="canvas")
-        button(id="fullScreen") <->
+            Your browser does not support canvas element.
         div(id="toolOptions")
-            button(class="closeRight") ->
             p tool : pen [1]
         div(id="info")
-            button(class="closeLeft") <-
             h2 Info
             h3 + 
             span key to Increase pensize
@@ -60,10 +57,8 @@ div(class="main_body_container")
             h3 c 
             span for circles   
             br
-        div(id="status")
-            p People in room  1
+        div(id="status") 
         div(id="chatWindow")
-            button(class="closeRight") ->
             h4 chat window
             form(action="",id="sendUser")
                 input(id="username",placeholder="   username")

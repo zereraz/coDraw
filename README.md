@@ -11,7 +11,7 @@ it uses socket.io
  - ~~update client side of sockets~~
  - ~~Talk with android app(send messages back and forth)~~
  - Brush Library
-
+ - Remake the create room/ join room and emulate the lasquare method
 ### Feautres
  - Realtime Drawing
  - Various tools like

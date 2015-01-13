@@ -8,12 +8,6 @@ body{
    /*2A2C2B*/ 
     background:url(/img/background.png);
 }
-.main_body_container {
-    min-width: 1005px; /* your desired width */
-    max-width: 100%;
-    position: relative;
-    overflow-x: hidden;
-}
 
 canvas{
     z-index:2;

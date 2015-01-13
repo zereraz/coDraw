@@ -1,195 +1,15 @@
 $('document').ready(function(){
 
-    var anyCloseLeft = $('.closeLeft');
-    var anyCloseRight = $('.closeRight');
-    var expandOrCollapse = $('#fullScreen');
-    var allCanvas = $('canvas');    
-    var canvas = document.getElementById('canvas');
-    var canvasBg = document.getElementById('canvasBg');
-    //original canvas width
-
-    // BOOL
-    // if all divs collapsed
-    var allCollapsed = false;
-
-    // events
-
-/*    optionClose.on('click',onCloseClick);
-    function onCloseClick(){
-        var width = $(this).parent().width()-10;
-        if(!optionClosed){
-            options.animate({"left":"-="+width+'px'},200);
-            optionClosed = true;
-        }else{
-            options.animate({"left":"+="+width+'px'},200);
-            optionClosed = false;
-        }
-    }
-*/
-    //generic left close
-    anyCloseLeft.on('click', onLeftCloseClick);
-
-    //generic right close
-    anyCloseRight.on('click', onRightCloseClick);
-
-    // expand or collapse all
-/*    expandOrCollapse.on('click', function(){
-        if(!allCollapsed){
-            collapseAll();
-            fullScreen(); 
-            allCollapsed = true;
-        }else{
-            expandAll();
-            endFullScreen();
-            allCollapsed = false;
-        }
-    });
-*/
-
-    // event handlers
-    
-    //generic close left
-    function onLeftCloseClick(){
-        var parent = $(this).parent();
-        var parentWidth = parent.width()-10;
-        var parentLeft = parent.css('left');
-        if(parentLeft=='0px'){
-            if($(this).text()=='<-'){
-                collapseThis(parent,"left",parentWidth,$(this));
-                $(this).text('->');
-            }
-        }else{
-            if($(this).text()=='->'){
-                expandThis(parent,"left",parentWidth,$(this));
-                $(this).text('<-');
-            }
-        }
-    }
-    //generic close right
-
-    function onRightCloseClick(){
-        var parent = $(this).parent();     
-        var parentWidth = parent.width()-10;
-        var parentRight = parent.css('right');
-        if(parentRight=='0px'){
-                if($(this).text()=='->'){
-                    collapseThis(parent,"right",parentWidth,$(this)); 
-                }
-            }else{
-                if($(this).text()=='<-'){
-                    expandThis(parent,"right",parentWidth,$(this));
-                }
-            }
-    }
-
-    //Helper functions
-    
-    function collapseThis(elem,direction,width,child){
-        if(direction == "left"){
-                if(child.text()=='<-'){
-                    elem.animate({"left":"-="+width+'px'},200);
-                    elem.hide(200);
-                    child.text('->');
-                }
-            }else{
-                if(child.text()=='->'){
-
-                    elem.animate({"right":"-="+width+'px'},200);
-                    elem.hide(200);
-                    child.text('<-');
-                    
-                }
-            }
-        }
-
-        function expandThis(elem,direction,width,child){
-            if(direction == "left"){
-                if(child.text()=='->'){
-                    elem.animate({"left":"+="+width+'px'},200);
-                    elem.show(200);
-                    child.text('<-');
-                }
-            }else{
-                if(child.text()=='<-'){
-                    elem.animate({"right":"+="+width+'px'},200);
-                    elem.show(200);
-                    child.text('->');
-                }
-        }
-    }
-    function collapseAll(){
-        var leftElems = $('.closeLeft');
-        var rightElems = $('.closeRight'); 
-        for(var i=0;i<leftElems.length;i++){ 
-            var elem = $(leftElems[i]);
-            var parent = elem.parent();
-            var parentWidth = parent.width()-10;
-            var parentLeft = parent.css('left');
-            collapseThis(parent,"left",parentWidth,elem);
-        }
-
-        for(var i=0;i<rightElems.length;i++){ 
-            var elem = $(rightElems[i]);
-            var parent = elem.parent();
-            var parentWidth = parent.width()-10;
-            var parentLeft = parent.css('right');
-            collapseThis(parent,"right",parentWidth,elem);
-        }
-    }
-
-    function expandAll(){
-        var leftElems = $('.closeLeft');
-        var rightElems = $('.closeRight'); 
-        for(var i=0;i<leftElems.length;i++){ 
-            var elem = $(leftElems[i]);
-            var parent = elem.parent();
-            var parentWidth = parent.width()-10;
-            var parentLeft = parent.css('left');
-            expandThis(parent,"left",parentWidth,elem);
-        }
-
-        for(var i=0;i<rightElems.length;i++){ 
-            var elem = $(rightElems[i]);
-            var parent = elem.parent();
-            var parentWidth = parent.width()-10;
-            var parentLeft = parent.css('right');
-            expandThis(parent,"right",parentWidth,elem);
-        }
-    }
-
-
-    //expand canvas when all else is collapsed
-    function changeCanvasSize(width,height){
-        canvas.width = width;
-        canvasBg.width = width;
-        canvas.height = height;
-        canvasBg.height = height;
-    }
-
-    function expandCanvas(){
-        var width = $(window).width();
-        var height = $(window).height();
-        changeCanvasSize(width,height);
-        for(var i=0;i<allCanvas.length;i++){
-            var canvas = $(allCanvas[i]);
-            canvas.animate({'left':'0px'},200);
-        }
-    }
-    function collapseCanvas(){ 
-        changeCanvasSize(width,height);
-        for(var i=0;i<allCanvas.length;i++){
-            var canvas = $(allCanvas[i]);
-            canvas.animate({'left':'15%'},200);
-        }
-    }
 	var canvas;
     var canvasBg;    
     // Context
     var ctx;
     var ctxBg;
 
+    // status of room
+    var status = {};
     // socket object 
-    var socket = io();
+    var socket; 
     // Width of canvas
 	var width;
 	// Height of canvas
@@ -324,6 +144,7 @@ $('document').ready(function(){
 	}
 
 	function init(){
+        socket = io();
         canvas = document.getElementById('canvas'); 
 		canvas.width = $(window).width()*0.5;
 		canvas.height= $(window).height()*0.5;
@@ -337,10 +158,27 @@ $('document').ready(function(){
         width = canvas.width;
 		height = canvas.height;
         imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
+
+        // Event listeners
 		canvas.addEventListener('mousedown', onMouseDown);
 		canvas.addEventListener('mouseup', onMouseUp);
 		canvas.addEventListener('mousemove', onMouseMove);
 		canvas.addEventListener('mouseout', onMouseOut);
+/*
+ *
+ *  Fix the reload problem, i.e same form submission again
+ *  sent ajax request and get the return value.
+ *  If can't refresh value then take back to home page
+ *  also if leave page then send disconnect event if possible
+ *  apparently that is not happening when user presses leave this 
+ *  page then the page closes without any other code working
+ */ 
+
+        window.addEventListener("beforeunload", function (e) {
+            var confirmationMessage = "sure ?";
+            (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+            return confirmationMessage;                            //Webkit, Safari, Chrome
+        });
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
     }
@@ -356,7 +194,7 @@ $('document').ready(function(){
 			prevY = currentY;
 		}else{
             //for mozilla e.offsetX is undefined
-            if(e.offsetX != undefined){
+            if(e.offsetX !== undefined){
                 prevX = e.offsetX;
                 prevY = e.offsetY;
             }else{
@@ -365,7 +203,7 @@ $('document').ready(function(){
             }
 		}
         //for mozilla e.offsetX is undefined
-        if(e.offsetX != undefined){
+        if(e.offsetX !== undefined){
             currentX = e.offsetX;
             currentY = e.offsetY;
         }else{
@@ -418,7 +256,7 @@ $('document').ready(function(){
         ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
         ctx.fill();
         ctx.restore(); 
-    }
+    };
     function drawStroke(){ 
         var change;
         colorChange(penColor);
@@ -444,24 +282,25 @@ $('document').ready(function(){
                             "string":myString,
                             "color":penColor,
                             "room":myRoom
-                        }
+                        };
                         socket.emit('text', textDetails);
                     } 
             }else if(shape && !moving){
                 radius = penSize;
+                var circleData = {};
                 switch(type[0]){
                     case 'c':
                         x = currentX;
                         y = currentY;
                         drawCircle(x,y,radius); 
-                        var circleData = {
+                        circleData = {
                             "type" : 'c',
                             "centerX" : x,
                             "centerY" : y,
                             "radius" :penSize,
                             "color":penColor,
                             "room" : myRoom 
-                        }
+                        };
                         socket.emit('shape', circleData);
                         break;
                 }
@@ -482,7 +321,7 @@ $('document').ready(function(){
                             "color" : penColor,
                             "radius" : radius,
                             "room" : myRoom
-                        }
+                        };
                         socket.emit('shape', circleData);
                         break;
                     case 'ct':
@@ -493,7 +332,7 @@ $('document').ready(function(){
                         }
                         drawCircle(x,y,radius);
                         
-                        var circleData = {
+                        circleData = {
                             "type" : type,
                             "centerX" : x,
                             "centerY" : y,
@@ -502,7 +341,7 @@ $('document').ready(function(){
                             "color":penColor,
                             "radius" : radius,
                             "room" : myRoom
-                        }
+                        };
                         socket.emit('shape', circleData);
                         break;
                     case 'cd':
@@ -514,14 +353,14 @@ $('document').ready(function(){
                         clearCircle(x,y,radius);
                         drawCircle(x,y,radius);
                         
-                        var circleData = {
+                        circleData = {
                             "type" : type,
                             "centerX" : x,
                             "centerY" : y,
                             "radius" : radius,
                             "color":penColor,
                             "room" : myRoom
-                        }
+                        };
                         socket.emit('shape', circleData);
                         break;
                 }
@@ -606,9 +445,9 @@ $('document').ready(function(){
         var tool;
         switch(caller){
             case "circle":
-                tool = "<select><option>default</option><option>cone</option><option>target</option></select>";
+                tool = "<select id="+caller+"><option>default</option><option>cone</option><option>target</option></select>";
                 optionDiv.append(tool);
-                $('select').on('change',function(){
+                $('#'+caller).on('change',function(){
                     var selected = $(this).val();
                     switch(selected){
                         case "cone":
@@ -620,9 +459,16 @@ $('document').ready(function(){
                         case "target":
                             type = 'ct';
                             break;
+
                     }
                 });
+                break;
+            case "square":
+                tool = "<select><option>default</option><option>sqExpand</option><option>target</option></select>";
+                optionDiv.append(tool);
 
+                
+                break;
 
         }
    } 
@@ -787,7 +633,7 @@ $('document').ready(function(){
     //Download the canvas
     $('#downloadCanvasLink').on('click',function(){
         var name = prompt("Name of image"); 
-        if(name==null){
+        if(name===null){
             return false;
         }
         this.href = document.getElementById('canvas').toDataURL();
@@ -811,7 +657,7 @@ $('document').ready(function(){
 
     $('#messageForm').on('submit',function(){
         var message = $('#reply').val(); 
-        if(username!=0){
+        if(username!==0){
             if(message.length>0){
                $('#messages').append('<li class="mySent">'+message+'<hr></li>');
                 var chatData = {
@@ -950,6 +796,12 @@ $('document').ready(function(){
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
     }
+
+    function updateStatus(myStatus){
+        myRoom = myStatus.room;
+        status = myStatus;
+        $('#status').html('<p>room : '+status.room+'</p><p> username : '+status.username+'</p><p> id : '+status.id+'</p><p>total user : '+status.users);
+    }
 /* 
     function undo(){
         eraserOn();
@@ -1043,4 +895,11 @@ $('document').ready(function(){
        
         $('#chatWindow').animate({scrollTop:height},0);
 });
+
+    socket.on('status', function(myStatus){
+       updateStatus(myStatus);
+      socket.emit('join', myStatus); 
+    });
+
+
 });
