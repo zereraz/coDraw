@@ -37,8 +37,11 @@ $('document').ready(function(){
     var shape = false;
     // circle on click
     var x,y;    
+    var px,py;    
     var penSize = parseInt($('#pSize').text());
     var radius = penSize;
+    var rWidth = penSize;
+    var rHeight = penSize;
     var penColor = "#000000";
     var prevPenColor = "#000000";       
     var bgColor = "#ffffff";
@@ -239,7 +242,7 @@ $('document').ready(function(){
 			ctx.stroke();
 			ctx.closePath();
     }
-   //drawing circle 
+   // drawing circle 
     function drawCircle(currentX,currentY,radius){
            /* var temp = ctx.lineWidth;
             ctx.lineWidth = 1;
@@ -248,6 +251,15 @@ $('document').ready(function(){
             ctx.arc(currentX,currentY,radius,0,Math.PI*2);
             ctx.stroke();
            
+    }
+    // drawing rectangle
+    function drawRectangle(currentX, currentY,width,height){
+        ctx.beginPath();
+        ctx.strokeRect(currentX,currentY,width,height);
+        ctx.stroke();
+    }
+    function clearRectangle (currentX, currentY,width,height){
+        ctx.clearRect(currentX,currentY,width,height);
     }
     var clearCircle = function(x, y, radius){
         ctx.save();
@@ -258,6 +270,7 @@ $('document').ready(function(){
         ctx.restore(); 
     };
     function drawStroke(){ 
+        // circle change
         var change;
         colorChange(penColor);
 		if(!text && !shape){
@@ -289,6 +302,7 @@ $('document').ready(function(){
                 radius = penSize;
                 var circleData = {};
                 switch(type[0]){
+                    //if circle
                     case 'c':
                         x = currentX;
                         y = currentY;
@@ -303,6 +317,10 @@ $('document').ready(function(){
                         };
                         socket.emit('shape', circleData);
                         break;
+                        //if rectangle
+                    case 'r':
+                        break;
+                        
                 }
             }else if(shape && moving){
                 switch(type){
@@ -363,6 +381,9 @@ $('document').ready(function(){
                         };
                         socket.emit('shape', circleData);
                         break;
+                    // Rectangle cases
+                    case 'rd':
+                        break;
                 }
             }
     }
@@ -400,6 +421,15 @@ $('document').ready(function(){
         updateCurrentTool($(this));
         addToOptions('circle');
         type = 'cd';
+        shape = true;
+    }
+
+// Rectangle mode on
+    function rectangleOn(){
+        off();
+        updateCurrentTool($(this));
+        addToOptions('rectangle');
+        type = 'rd';
         shape = true;
     }
 // circle mode off
@@ -463,15 +493,28 @@ $('document').ready(function(){
                     }
                 });
                 break;
-            case "square":
-                tool = "<select><option>default</option><option>sqExpand</option><option>target</option></select>";
+            case "rectangle":
+                tool = "<select><option>default</option><option>rectCone</option><option>rectTarget</option></select>";
                 optionDiv.append(tool);
+                $('#'+caller).on('change',function(){
+                    var selected = $(this).val();
+                    switch(selected){
+                        case "cone":
+                            type = 'rco';
+                            break;
+                        case "default":
+                            type = 'rd';
+                            break;
+                        case "target":
+                            type = 'rt';
+                            break;
 
-                
+                    }
+                });
                 break;
-
         }
-   } 
+                
+    }
     function bg(){  
         if(bgColor.length<=1){
             bgColor = "#ffffff";
@@ -592,6 +635,8 @@ $('document').ready(function(){
     // Click on Circle tool
     $('#circleTool').on('click',circleOn);
 
+    // Click on rectangle tool
+    $('#rectangleTool').on('click',rectangleOn);
     // Click on text
     $('#textTool').on('click', textOn);
 
@@ -606,6 +651,11 @@ $('document').ready(function(){
         ctx.clearRect(0,0,canvas.width,canvas.height); 
     });
 
+    // Opacity
+    $('#opacity').on('change',function(){
+        $('#opacityVal').text('opacity '+$(this).val());
+        ctx.globalAlpha = $(this).val();
+    });
     // Linewidth change
     $('#lineWidth').on('change',function(){
         var lineWidth = parseInt($(this).val());
@@ -800,7 +850,7 @@ $('document').ready(function(){
     function updateStatus(myStatus){
         myRoom = myStatus.room;
         status = myStatus;
-        $('#status').html('<p>room : '+status.room+'</p><p> username : '+status.username+'</p><p> id : '+status.id+'</p><p>total user : '+status.users);
+        $('#status').html('<h3>room : '+status.room+'</h3><h3> username : '+status.username+'</h3><h3> id : '+status.id+'</h3><h3>total user : '+status.users);
     }
 /* 
     function undo(){
@@ -845,7 +895,6 @@ $('document').ready(function(){
     socket.on('drawClick', function(data){
         colorChange(data.penColor);
         drawClick(data.x,data.y,data.penSize);
-        pen(); 
         colorChange(penColor);
     });
     

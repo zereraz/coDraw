@@ -4,7 +4,7 @@ var roomLord = {};
 
 // Get room.jade
 exports.gRoom = function(req,res){
-    res.render('canvas');
+    res.render('room');
 };
 
 // Get roomId
@@ -15,6 +15,18 @@ exports.getRoom = function(){
 // Get the username
 exports.getUser = function(){
     return userName;
+};
+
+exports.deleteRoom = function(room){
+    delete roomLord[room]; 
+};
+
+exports.deleteUser = function(user,room){
+    console.log(user+" "+room);
+    var i = roomLord[room].userList.indexOf(user);
+    if(i!==-1){
+        roomLord[room].userList.splice(i,1);
+    }
 };
 
 exports.userCheck = function(req,res){
@@ -45,5 +57,5 @@ exports.pRoom = function(req,res){
             roomLord[roomId].userList.push(userName);
         }
     }
-    res.render('canvas');
+    res.render('room');
 };

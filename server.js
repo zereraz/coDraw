@@ -145,9 +145,30 @@ io.on('connection', function(socket){
     }
 
         socket.on('disconnect', function(){
+            var id = socket.id;
+            // roomLord gets an undefined key at beginning
+            delete roomLord[undefined];
+            var keys = Object.keys(roomLord);
+            for(var i = 0 ; i < keys.length ; i++){
+                var roomData = roomLord[keys[i]];
+                var users = roomData.userList;
+                for(var j = 0 ; j < users.length ; j++){
+                    if(id == Object.keys(users[j])){ 
+                        console.log("user with id "+id+" disconnected");
+                        room.deleteUser(users[j][id],keys[i]);
+                        users.splice(j,1);
+                        roomData.users -= 1;
+                    }
+                }
+                if(roomData.users===0){
+                    room.deleteRoom(keys[i]);
+                    delete roomLord[keys[i]];
+                    console.log("deleting room "+keys[i]);
+                }
+            }
+
             activeConnections--;
-            
-            io.sockets.emit('userDisconnected',activeConnections);
+             
         });
 
 });
