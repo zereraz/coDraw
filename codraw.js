@@ -168,6 +168,7 @@ io.on('connection', function(socket){
             }
 
             activeConnections--;
+            socket.emit('updateUsers',"dec");
              
         });
 

@@ -40,6 +40,8 @@ $('document').ready(function(){
     var px,py;    
     var penSize = parseInt($('#pSize').text());
     var radius = penSize;
+    //line
+    var lpt = []; 
     var rWidth = penSize;
     var rHeight = penSize;
     var penColor = "#000000";
@@ -129,7 +131,12 @@ $('document').ready(function(){
 	function onMouseUp(e){
 		findxy(e);
 		mouseClick = false;
-	}
+	    if(type[0] == 'l'){
+            lpt.push({'x':currentX,'y':currentY});
+            drawLine(lpt[0].x,lpt[0].y,lpt[1].x,lpt[1].y);
+            lpt = [];
+        } 
+    }
 	
 	function onMouseMove(e){
 		moving = true;
@@ -149,15 +156,14 @@ $('document').ready(function(){
 	function init(){
         socket = io();
         canvas = document.getElementById('canvas'); 
-		canvas.width = $(window).width()*0.5;
-		canvas.height= $(window).height()*0.5;
+		canvas.width = $(window).height(); 
+		canvas.height= $(window).width()*0.35;
         ctx = canvas.getContext('2d');
 		canvasBg = document.getElementById('canvasBg');
-		canvasBg.width = $(window).width()*0.5;
-		canvasBg.height= $(window).height()*0.5;
+		canvasBg.width = $(window).height();
+		canvasBg.height= $(window).width()*0.35;
         ctxBg = canvasBg.getContext('2d'); 
-        ctxBg.fillStyle = bgColor;
-        ctxBg.fillRect(0,0,canvas.width,canvas.height);
+        drawPattern();
         width = canvas.width;
 		height = canvas.height;
         imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
@@ -176,12 +182,12 @@ $('document').ready(function(){
  *  apparently that is not happening when user presses leave this 
  *  page then the page closes without any other code working
  */ 
-
+/*
         window.addEventListener("beforeunload", function (e) {
             var confirmationMessage = "sure ?";
             (e || window.event).returnValue = confirmationMessage; //Gecko + IE
             return confirmationMessage;                            //Webkit, Safari, Chrome
-        });
+        });*/
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
     }
@@ -189,7 +195,20 @@ $('document').ready(function(){
     //
 	// Drawing functions
 	//
+    //
+    function drawPattern(){
 
+        var imageObj = new Image();
+        imageObj.onload = function() {
+            var pattern = ctxBg.createPattern(imageObj, 'repeat');
+
+            ctxBg.rect(0, 0, canvasBg.width, canvasBg.height);
+            ctxBg.fillStyle = pattern;
+            ctxBg.fill();
+        };
+        imageObj.src = '/img/transp_bg.png';
+    
+    }
 	function findxy(e){
 	    $('canvas').css({'cursor':'crosshair'});
         if(mouseClick){
@@ -269,7 +288,15 @@ $('document').ready(function(){
         ctx.fill();
         ctx.restore(); 
     };
-    function drawStroke(){ 
+    function drawLine(x1,y1,x2,y2){
+
+        ctx.beginPath();
+        ctx.moveTo(x1,y1);
+        ctx.lineTo(x2,y2);
+        ctx.stroke();
+    }
+
+    function drawStroke(){
         // circle change
         var change;
         colorChange(penColor);
@@ -319,8 +346,20 @@ $('document').ready(function(){
                         break;
                         //if rectangle
                     case 'r':
+                        x = currentX;
+                        y = currentY;
+                        rWidth = penSize;
+                        rHeight = penSize;
+                        drawRectangle(x,y,rWidth,rHeight);
                         break;
-                        
+                    case 'l':
+                        x = currentX;
+                        y = currentY;
+                        lpt.push({'x':x,'y':y});
+                        if(lpt.length == 2){
+                            drawLine(lpt[0].x,lpt[0].y,lpt[1].x,lpt[1].y);
+                            lpt = [];
+                        } 
                 }
             }else if(shape && moving){
                 switch(type){
@@ -384,6 +423,14 @@ $('document').ready(function(){
                     // Rectangle cases
                     case 'rd':
                         break;
+                    case 'ld':
+                        
+                        break;
+                    case 'lco':
+                        if(lpt.length == 1){
+                           drawLine(lpt[0].x,lpt[0].y,currentX,currentY); 
+                        }
+                        break;
                 }
             }
     }
@@ -430,6 +477,14 @@ $('document').ready(function(){
         updateCurrentTool($(this));
         addToOptions('rectangle');
         type = 'rd';
+        shape = true;
+    }
+// line mode on
+    function lineOn(){
+        off();
+        updateCurrentTool($(this));
+        addToOptions('line');
+        type = 'ld';
         shape = true;
     }
 // circle mode off
@@ -494,7 +549,7 @@ $('document').ready(function(){
                 });
                 break;
             case "rectangle":
-                tool = "<select><option>default</option><option>rectCone</option><option>rectTarget</option></select>";
+                tool = "<select id="+caller+"><option>default</option><option>rectCone</option><option>rectTarget</option></select>";
                 optionDiv.append(tool);
                 $('#'+caller).on('change',function(){
                     var selected = $(this).val();
@@ -507,6 +562,22 @@ $('document').ready(function(){
                             break;
                         case "target":
                             type = 'rt';
+                            break;
+
+                    }
+                });
+                break;
+            case "line":
+                tool = "<select id="+caller+"><option>default</option><option>lineCone</option></select>";
+                optionDiv.append(tool);
+                $('#'+caller).on('change',function(){
+                    var selected = $(this).val();
+                    switch(selected){
+                        case "lineCone":
+                            type = 'lco';
+                            break;
+                        case "default":
+                            type = 'ld';
                             break;
 
                     }
@@ -637,6 +708,10 @@ $('document').ready(function(){
 
     // Click on rectangle tool
     $('#rectangleTool').on('click',rectangleOn);
+
+    // Click on line tool
+    $('#lineTool').on('click',lineOn);
+
     // Click on text
     $('#textTool').on('click', textOn);
 
