@@ -3,27 +3,23 @@ block content
         div(id="options")
                 button(id="clearCanvas",title="Clear Canvas")
                     img(src="/img/t_clear.png")
-                button(id="textTool",title="Text [t]")
+                button(id="textTool",title="Text [t]",data-tool="text")
                     img(src="/img/t_text.png")
-                button(id="brush",title="Brush [3]")
+                button(id="brush",title="Brush [3]",data-tool="brush")
                     img(src="/img/t_brush.png")
-                button(id="eraser",title="Eraser [2]") 
+                button(id="eraser",title="Eraser [2]",data-tool="eraser") 
                     img(src="/img/t_eraser.png")
-                button(id="pen",title="Pencil [1]")
+                button(id="pen",title="Pencil [1]",data-tool="pencil")
                     img(src="/img/t_pencil.png")
-                button(id="circleTool",title="Circle [c]")
+                button(id="circleTool",title="Circle [c]",data-tool="circle")
                     img(src="/img/t_circle.png")
-                button(id="lineTool",title="Line []")
+                button(id="lineTool",title="Line []",data-tool="line")
                     p line
-                button(id="rectangleTool",title="Rectangle []")
+                button(id="rectangleTool",title="Rectangle []",data-tool="rectangle")
                     p rectangle
                 a(id="downloadCanvasLink")
                     button(id="downloadCanvas")
                         img(src="/img/t_download.png")
-                div(id="penSz")
-                    h3(id="pSize") 5
-                    button(id="inc") + [+]
-                    button(id="dec") - [-]
                 button
                     div(id="pColor") 
                 div(id="penColor") 
@@ -112,6 +108,7 @@ block content
     canvas(id="canvas", width="500", height="500")
     button(id="fullScreen") Full Screen
     div(id="toolOptions")
+        div(id="toolContainer")
         p tool : pen [1]
     div(id="info")
         h2 Info

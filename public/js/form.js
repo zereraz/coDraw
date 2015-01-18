@@ -14,7 +14,13 @@ $(document).ready(function(){
             $.get('/usercheck',{"username":userName,"room":room},function(data){
                 if(data ==='-1'){
                     $('#error h3').text("USERNAME ALREADY TAKEN"); 
+                }else if(data === 0){
+                    $('#crOrjo').text('Create room');
+                    preventForm = false;
+                    $('form').submit();
+                    return true;
                 }else{
+                    $('#crOrjo').text('Join room');
                     preventForm = false;
                     $('form').submit();
                     return true;

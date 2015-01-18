@@ -36,6 +36,7 @@ $('document').ready(function(){
 	var moving = false;
     var isFullScreen = false;
     var shape = false;
+    var brush = false;
     // circle on click
     var x,y;    
     var px,py;    
@@ -47,6 +48,7 @@ $('document').ready(function(){
     var rHeight = penSize;
     var penColor = "#000000";
     var prevPenColor = "#000000";       
+    var prevGlobalComposition;
     var bgColor = "#ffffff";
     var currentTool = 'pen';
     var eraser = false;
@@ -300,6 +302,7 @@ $('document').ready(function(){
     function drawStroke(){
         // circle change
         var change;
+        var changeX,changeY;
         colorChange(penColor);
 		if(!text && !shape){
             if(!moving){ 
@@ -422,7 +425,23 @@ $('document').ready(function(){
                         socket.emit('shape', circleData);
                         break;
                     // Rectangle cases
-                    case 'rd':
+                    case 'rd':                        
+                        changeX = currentX - prevX;
+                        changeY = currentY - prevY; 
+                        rWidth += changeX;
+                        rHeight += changeY;
+                        var lw = ctx.lineWidth;
+                        changeLineWidth(lw+5);
+                        clearRectangle(x-ctx.lineWidth,y-ctx.lineWidth,rWidth+ctx.lineWidth,rHeight+ctx.lineWidth);
+                        changeLineWidth(lw);
+                        drawRectangle(x,y,rWidth,rHeight);
+                        break;
+                    case 'rt':                        
+                        changeX = currentX - prevX;
+                        changeY = currentY - prevY; 
+                        rWidth += changeX;
+                        rHeight += changeY;
+                        drawRectangle(x,y,rWidth,rHeight);
                         break;
                     case 'ld':
                         if(lpt.length == 1){
@@ -445,26 +464,45 @@ $('document').ready(function(){
                 }
             }
     }
+    function penOn(){
+        off();
+        updateCurrentTool($(this));
+        addToOptions(currentTool); 
+    }
     //off eraser text
     function off(){
        eraserOff();
        textOff();
-       circleOff();
+       shapeOff();
+       brushOff();
     } 
 // In eraser mode
     function eraserOn(){
         off();
         updateCurrentTool($(this));
-        eraser = true;
+        eraser = true; 
         prevPenColor = penColor;
-        penColor = bgColor; 
+        penColor = "rgb(0,0,0,1)"; 
+        prevGlobalComposition = ctx.globalCompositeOperation;
+        ctx.globalCompositeOperation = "destination-out";
         penColorChange();
     }
     
     function eraserOff(){
         eraser = false;
         penColor = prevPenColor;
+        ctx.globalCompositeOperation = prevGlobalComposition;
         penColorChange();
+    }
+// Brush mode
+    function brushOn(){
+        off();
+        brush = true;    
+        updateCurrentTool($(this));
+        addToOptions('brush');
+    }
+    function brushOff(){
+        brush = false;
     }
 // In text mode
     function textOn(){
@@ -499,8 +537,8 @@ $('document').ready(function(){
         shape = true;
     }
 // circle mode off
-    function circleOff(){
-        $('#toolOptions select').remove();
+    function shapeOff(){
+        $('#toolContainer').remove();
         shape = false;
     }
     function putText(){
@@ -532,7 +570,7 @@ $('document').ready(function(){
     function updateCurrentTool(btn,extra){
         // function invoked on click
         if(btn.is("button")){
-            currentTool = btn.text();
+            currentTool = btn.data("tool");
         }else{
             //function invoked on key press/other uses
             if(extra){
@@ -542,9 +580,19 @@ $('document').ready(function(){
         $('#toolOptions p').text('tool : '+currentTool);
     }
    function addToOptions(caller){
-        var optionDiv = $('#toolOptions');
+        var option = $('#toolOptions');
+        option.append("<div id='toolContainer'></div>");
+        var optionDiv = $('#toolContainer');
         var tool;
         switch(caller){
+            case "pencil":
+                tool = '<h3 id="pSize">pensize 1</h3><input id="penSize" min="1" max="100" type="range"step="1"value="1">';               
+                optionDiv.append(tool);
+                $('#penSize').on('change',function(){
+                    $('#pSize').text('pensize : '+$(this).val());
+                    updatePenSize($(this).val());
+                });
+                break;
             case "circle":
                 tool = "<select id="+caller+"><option>default</option><option>cone</option><option>target</option></select>";
                 optionDiv.append(tool);
@@ -565,18 +613,15 @@ $('document').ready(function(){
                 });
                 break;
             case "rectangle":
-                tool = "<select id="+caller+"><option>default</option><option>rectCone</option><option>rectTarget</option></select>";
+                tool = "<select id="+caller+"><option>default</option><option>rectTarget</option></select>";
                 optionDiv.append(tool);
                 $('#'+caller).on('change',function(){
                     var selected = $(this).val();
                     switch(selected){
-                        case "cone":
-                            type = 'rco';
-                            break;
                         case "default":
                             type = 'rd';
                             break;
-                        case "target":
+                        case "rectTarget":
                             type = 'rt';
                             break;
 
@@ -599,6 +644,7 @@ $('document').ready(function(){
                     }
                 });
                 break;
+
         }
                 
     }
@@ -707,11 +753,6 @@ $('document').ready(function(){
     //
     
    
-    // Click on the + button
-    $('#inc').on('click', incPenSize);
-
-    // Click on - button
-    $('#dec').on('click', decPenSize);
 
     // Input on the color change of pen 
     $('#pColorInp').on('change', penColorChange);
@@ -735,8 +776,10 @@ $('document').ready(function(){
     $('#eraser').on('click', eraserOn);
 
     // Click on button pen
-    $('#pen').on('click',off);
+    $('#pen').on('click', penOn);
 
+    // click on Brush
+    $('#brush').on('click',brushOn);
     // Clear Canvas
     $('#clearCanvas').on('click', function(){
         ctx.clearRect(0,0,canvas.width,canvas.height); 
@@ -862,23 +905,13 @@ $('document').ready(function(){
     // Event Handlers
     //
     
-    // Increase Pen Size 
-    function incPenSize(){
-        penSize +=1;
-        $('#pSize').text(penSize);
+    // Update Pen Size 
+    function updatePenSize(size){
+        penSize  = size;
+        $('#pSize').text('pensize : '+penSize);
         $('#pColor').css({width:penSize,height:penSize});
     }
 
-    // Decrease Pen Size 
-    function decPenSize(){
-        if(penSize>0){
-            penSize -=1;
-        }else{
-            penSize = 0;
-        }
-        $('#pSize').text(penSize);
-        $('#pColor').css({width:penSize,height:penSize});
-    }
     
     // Change Color
     function colorChange(color){

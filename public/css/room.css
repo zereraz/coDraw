@@ -242,8 +242,8 @@ button{
  *
  */
 #toolOptions{
-    width:100px;
-    height:100px;
+    width:200px;
+    height:200px;
     color:#EF4F1D;
     background:#343434;
     border:1px solid #EF4F1D; 
@@ -251,6 +251,7 @@ button{
     border-right:0;
     position:absolute;
     right:0px;
+    top:50px;
 }
 #toolOptions p{
     margin:5px;
@@ -262,6 +263,9 @@ button{
     position:absolute;
     bottom:0px;
     margin:10px;
+}
+#toolOptions input{
+    float:left;
 }
 .optionInput{
     width:70px; 
