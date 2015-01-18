@@ -23,6 +23,7 @@ $('document').ready(function(){
 	var prevX;
 	var prevY;
 
+    var type = '';
     // ImageData i.e Save
     var imageData;
     // for enter key to send messages in chat
@@ -280,14 +281,14 @@ $('document').ready(function(){
     function clearRectangle (currentX, currentY,width,height){
         ctx.clearRect(currentX,currentY,width,height);
     }
-    var clearCircle = function(x, y, radius){
+    function clearCircle(x, y, radius){
         ctx.save();
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
         ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
         ctx.fill();
         ctx.restore(); 
-    };
+    }
     function drawLine(x1,y1,x2,y2){
 
         ctx.beginPath();
@@ -407,7 +408,7 @@ $('document').ready(function(){
                         if(radius<0){
                             radius = radius*(-1);
                         }
-                        clearCircle(x,y,radius);
+                        clearCircle(x,y,radius+ctx.lineWidth);
                         drawCircle(x,y,radius);
                         
                         circleData = {
@@ -424,7 +425,17 @@ $('document').ready(function(){
                     case 'rd':
                         break;
                     case 'ld':
-                        
+                        if(lpt.length == 1){
+                            var temp = ctx.globalCompositeOperation;
+                            var lw = ctx.lineWidth;
+                            ctx.lineWidth += ctx.lineWidth;
+                            ctx.globalCompositeOperation = 'destination-out'; 
+                            drawLine(lpt[0].x,lpt[0].y,currentX,currentY); 
+                            drawLine(lpt[0].x,lpt[0].y,prevX,prevY); 
+                            ctx.globalCompositeOperation = temp; 
+                            ctx.lineWidth = lw;
+                            drawLine(lpt[0].x,lpt[0].y,currentX,currentY); 
+                        } 
                         break;
                     case 'lco':
                         if(lpt.length == 1){
@@ -513,6 +524,11 @@ $('document').ready(function(){
             penColor = "#000000";
         }
     }
+
+    function changeLineWidth(lineWidth){ 
+        ctx.lineWidth = lineWidth; 
+    }
+
     function updateCurrentTool(btn,extra){
         // function invoked on click
         if(btn.is("button")){
@@ -649,7 +665,7 @@ $('document').ready(function(){
     }
 	
     function dragDrawEmit(){
-        var type = checkType();
+        type = checkType();
        /* var undoData = {
                 'prevX':prevX,
                 'prevY':prevY,
@@ -734,8 +750,7 @@ $('document').ready(function(){
     // Linewidth change
     $('#lineWidth').on('change',function(){
         var lineWidth = parseInt($(this).val());
-        ctx.lineWidth = lineWidth; 
-
+        changeLineWidth(lineWidth);
     });
 
     $('#lineWidth').on('focusin',function(){
