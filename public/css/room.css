@@ -147,10 +147,10 @@ h3{
   */
     border-left:0;
     background:#343434;
-    height:100px;
+    height:400px;
     color:#EF4F1D; 
     position:absolute;
-    top:150px;
+    top:50px;
     left:0px;
     overflow:auto;
 }
@@ -243,7 +243,7 @@ button{
  */
 #toolOptions{
     width:200px;
-    height:200px;
+    height:250px;
     color:#EF4F1D;
     background:#343434;
     border:1px solid #EF4F1D; 
@@ -252,36 +252,22 @@ button{
     position:absolute;
     right:0px;
     top:50px;
-}
-#toolOptions p{
-    margin:5px;
-    position:absolute;
-    bottom:30px;
+    overflow:auto;
 }
 
-#toolOptions select{
-    position:absolute;
-    bottom:0px;
-    margin:10px;
-}
-#toolOptions input{
-    float:left;
-}
 .optionInput{
     width:70px; 
     border:1px solid #EF4F1D; 
-}
-
-/*
+}/*
  *
  * Chat Window
  *
  */
 #chatWindow{
     position:absolute;
-    top:54%;
+    bottom:0px;
     padding:10px;
-    height:250px;
+    height:150px;
     right:0px;
     color:#EF4F1D;
  /*   background:#343434;
@@ -330,3 +316,6 @@ button{
 }
 
 
+.tool{
+    display:block;
+}

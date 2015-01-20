@@ -41,11 +41,11 @@ $('document').ready(function(){
     var x,y;    
     var px,py;    
     var penSize = parseInt($('#pSize').text());
-    var radius = penSize;
+    var radius = 1;
     //line
     var lpt = []; 
-    var rWidth = penSize;
-    var rHeight = penSize;
+    var rWidth = 1;
+    var rHeight = 1;
     var penColor = "#000000";
     var prevPenColor = "#000000";       
     var prevGlobalComposition;
@@ -72,40 +72,36 @@ $('document').ready(function(){
     // 'enter' key to enter fullscreen or escape fullScreen
     
     $(document).keypress(function(e){
-       //console.log("which "+e.which+" keyCode "+e.keyCode+" window "+window.event.keyCode); 
+       console.log("which "+e.which+" keyCode "+e.keyCode+" window "+window.event.keyCode); 
 
             // + 
             if(e.which == 61 || e.keyCode == 61){
-                incPenSize();
+                updatePenSize(penSize+1);
             }
             
             // -     
             if(e.which == 45 || e.keyCode == 45){
-                decPenSize();
+                updatePenSize(penSize-1);
             }
             
             // 2
             if((e.which == 50 || e.keyCode == 50) && !inputOptions){
                 eraserOn();
-                updateCurrentTool($('p'),'eraser [2]');
             }
             
             // 1        
             if((e.which == 49 || e.keyCode == 49) && !inputOptions){
                 off();
-                updateCurrentTool($('p'),'pen [1]');
             }
             
             // t        
             if(e.which == 116 || e.keyCode == 116){
                 textOn();
-                updateCurrentTool($('p'),'text [t]');
             }
             
             // c        
             if(e.which == 99 || e.keyCode == 99){
                 circleOn();
-                updateCurrentTool($('p'),'Circle [c]');
             }
 
             // enter 
@@ -118,6 +114,12 @@ $('document').ready(function(){
                     }
                 }
             } 
+            if(e.which == 114 || e.keyCode == 114){
+                rectangleOn();
+            }
+            if(e.which == 108 || e.keyCode == 108){
+                lineOn();
+            }
         });
 
     //
@@ -193,6 +195,10 @@ $('document').ready(function(){
         });*/
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
+        penSize = 1;
+        var option = $('#toolOptions');
+        option.append("<div id='toolContainer'></div>");
+        pencilAdd($('#toolContainer'),'pencil');
     }
 
     //
@@ -266,7 +272,7 @@ $('document').ready(function(){
     }
    // drawing circle 
     function drawCircle(currentX,currentY,radius){
-           /* var temp = ctx.lineWidth;
+           /* var temp = ctx.lineWidth
             ctx.lineWidth = 1;
             */
             ctx.beginPath();
@@ -330,7 +336,6 @@ $('document').ready(function(){
                         socket.emit('text', textDetails);
                     } 
             }else if(shape && !moving){
-                radius = penSize;
                 var circleData = {};
                 switch(type[0]){
                     //if circle
@@ -344,7 +349,8 @@ $('document').ready(function(){
                             "centerY" : y,
                             "radius" :penSize,
                             "color":penColor,
-                            "room" : myRoom 
+                            "room" : myRoom,
+                            "lw":ctx.lineWidth
                         };
                         socket.emit('shape', circleData);
                         break;
@@ -352,8 +358,6 @@ $('document').ready(function(){
                     case 'r':
                         x = currentX;
                         y = currentY;
-                        rWidth = penSize;
-                        rHeight = penSize;
                         drawRectangle(x,y,rWidth,rHeight);
                         break;
                     case 'l':
@@ -370,6 +374,7 @@ $('document').ready(function(){
                     case 'cco': 
                         change = currentX - prevX;
                         radius += change;
+                        updateRadius(radius);
                         if(radius<0){
                             radius = radius*(-1);
                         }
@@ -381,13 +386,15 @@ $('document').ready(function(){
                             "centerY" : currentY,
                             "color" : penColor,
                             "radius" : radius,
-                            "room" : myRoom
+                            "room" : myRoom,
+                            "lw":ctx.lineWidth
                         };
                         socket.emit('shape', circleData);
                         break;
                     case 'ct':
                         change = currentX - prevX;
                         radius += change;
+                        updateRadius(radius);
                         if(radius<0){
                             radius = radius*(-1);
                         }
@@ -401,17 +408,19 @@ $('document').ready(function(){
                             "prevX" : prevX,
                             "color":penColor,
                             "radius" : radius,
-                            "room" : myRoom
+                            "room" : myRoom,
+                            "lw":ctx.lineWidth
                         };
                         socket.emit('shape', circleData);
                         break;
                     case 'cd':
                         change = currentX - prevX;
                         radius += change;
+                        updateRadius(radius);
                         if(radius<0){
                             radius = radius*(-1);
                         }
-                        clearCircle(x,y,radius+ctx.lineWidth);
+                        clearCircle(x,y,radius+ctx.lineWidth/2);
                         drawCircle(x,y,radius);
                         
                         circleData = {
@@ -420,9 +429,13 @@ $('document').ready(function(){
                             "centerY" : y,
                             "radius" : radius,
                             "color":penColor,
-                            "room" : myRoom
+                            "room" : myRoom,
+                            "lw":ctx.lineWidth
                         };
                         socket.emit('shape', circleData);
+                        break;
+                    case 'cb':
+                        drawCircle(currentX,currentY,radius);
                         break;
                     // Rectangle cases
                     case 'rd':                        
@@ -430,6 +443,7 @@ $('document').ready(function(){
                         changeY = currentY - prevY; 
                         rWidth += changeX;
                         rHeight += changeY;
+                        updateRect();
                         var lw = ctx.lineWidth;
                         changeLineWidth(lw+5);
                         clearRectangle(x-ctx.lineWidth,y-ctx.lineWidth,rWidth+ctx.lineWidth,rHeight+ctx.lineWidth);
@@ -441,7 +455,11 @@ $('document').ready(function(){
                         changeY = currentY - prevY; 
                         rWidth += changeX;
                         rHeight += changeY;
+                        updateRect();
                         drawRectangle(x,y,rWidth,rHeight);
+                        break;
+                    case 'rb':                        
+                        drawRectangle(currentX,currentY,rWidth,rHeight);
                         break;
                     case 'ld':
                         if(lpt.length == 1){
@@ -471,10 +489,11 @@ $('document').ready(function(){
     }
     //off eraser text
     function off(){
-       eraserOff();
-       textOff();
-       shapeOff();
-       brushOff();
+        changeLineWidth(1);
+        eraserOff();
+        textOff();
+        shapeOff();
+        brushOff();
     } 
 // In eraser mode
     function eraserOn(){
@@ -563,7 +582,8 @@ $('document').ready(function(){
         }
     }
 
-    function changeLineWidth(lineWidth){ 
+    function changeLineWidth(lineWidth){
+        $('#lineW').text('lineWidth : '+lineWidth);
         ctx.lineWidth = lineWidth; 
     }
 
@@ -578,24 +598,39 @@ $('document').ready(function(){
             }
         }
         $('#toolOptions p').text('tool : '+currentTool);
+    
     }
-   function addToOptions(caller){
-        var option = $('#toolOptions');
-        option.append("<div id='toolContainer'></div>");
-        var optionDiv = $('#toolContainer');
-        var tool;
-        switch(caller){
-            case "pencil":
-                tool = '<h3 id="pSize">pensize 1</h3><input id="penSize" min="1" max="100" type="range"step="1"value="1">';               
+
+    // Refactor all html to different variables and just add them
+
+    function lineWidthAdd(optionDiv,caller){
+        // Linewidth change
+        var tool = '<div class="tool"><p id="lineW">lineWidth : 1</p><input id="lineWidth" min="1" max="50" type="range"step="1" value="1"><p>tool : '+caller+'</div>'; 
+        optionDiv.append(tool); 
+        var lineWidth = 1;
+        $('#lineW').text('lineWidth : '+lineWidth);
+        
+        $('#lineWidth').on('change',function(){
+            lineWidth = $(this).val();
+            changeLineWidth(lineWidth);
+        });
+    }
+        
+    function pencilAdd(optionDiv,caller){
+        var tool = '<div class="tool"><p id="pSize">pensize : 1</p><input id="penSize" min="1" max="200" type="range"step="1"value="1"><p>tool : pencil</p></div>';               
+        optionDiv.append(tool);
+        $('#penSize').on('change',function(){
+            updatePenSize($(this).val());
+        });
+    }
+    function circleAdd(optionDiv,caller){ 
+
+        var tool = "<div class='tool'><p id='rSize'>radius : 1</p><input id='radius' min='1' max='300' type='range'step='1'value='1'><select id="+caller+"><option>default</option><option>cone</option><option>target</option><option>brush</option></select></div>";
                 optionDiv.append(tool);
-                $('#penSize').on('change',function(){
-                    $('#pSize').text('pensize : '+$(this).val());
-                    updatePenSize($(this).val());
+                lineWidthAdd(optionDiv,caller);
+                $('#radius').on('change',function(){
+                    updateRadius($(this).val());
                 });
-                break;
-            case "circle":
-                tool = "<select id="+caller+"><option>default</option><option>cone</option><option>target</option></select>";
-                optionDiv.append(tool);
                 $('#'+caller).on('change',function(){
                     var selected = $(this).val();
                     switch(selected){
@@ -608,29 +643,18 @@ $('document').ready(function(){
                         case "target":
                             type = 'ct';
                             break;
-
-                    }
-                });
-                break;
-            case "rectangle":
-                tool = "<select id="+caller+"><option>default</option><option>rectTarget</option></select>";
-                optionDiv.append(tool);
-                $('#'+caller).on('change',function(){
-                    var selected = $(this).val();
-                    switch(selected){
-                        case "default":
-                            type = 'rd';
-                            break;
-                        case "rectTarget":
-                            type = 'rt';
+                        case "brush":
+                            type = 'cb';
                             break;
 
                     }
                 });
-                break;
-            case "line":
-                tool = "<select id="+caller+"><option>default</option><option>lineCone</option></select>";
+    }
+    function lineAdd(optionDiv,caller){
+
+          var tool = "<div class='tool'><p>tool : line</p><select id="+caller+"><option>default</option><option>lineCone</option></select></div>";
                 optionDiv.append(tool);
+                lineWidthAdd(optionDiv,caller);
                 $('#'+caller).on('change',function(){
                     var selected = $(this).val();
                     switch(selected){
@@ -643,6 +667,71 @@ $('document').ready(function(){
 
                     }
                 });
+    }
+    // Refactor, create a function that creates an input range
+    // with all the given parameters. more generic
+    // also make an event add function
+    function rectangleAdd(optionDiv,caller){
+     
+        var tool = "<div class='tool'><p id='wi'>width : 1</p><input id='width' min='1' max='300' type='range'step='1'value='1'><p id='hi'>height : 1</p><input id='height' min='1' max='300' type='range'step='1'value='1'><select id="+caller+"><option>default</option><option>rectTarget</option><option>brush</option></select></div>";
+
+        optionDiv.append(tool);
+        lineWidthAdd(optionDiv,caller);
+        $('#width').on('change',function(){
+            rWidth = parseInt($(this).val());
+            updateRect();
+        });
+
+        $('#height').on('change',function(){
+            rHeight = parseInt($(this).val());
+            updateRect();
+        });
+
+        $('#'+caller).on('change',function(){
+            var selected = $(this).val();
+            switch(selected){
+                case "default":
+                    type = 'rd';
+                break;
+                case "rectTarget":
+                    type = 'rt';
+                break;
+                case 'brush':
+                    type = 'rb';
+
+            }
+        });
+    }
+
+    function brushAdd(optionDiv, caller){
+        var tool = "<div class='tool'><select><option>simple</option></select></div>";
+        
+        optionDiv.append(tool);
+        lineWidthAdd(optionDiv,caller);
+
+    }
+
+   function addToOptions(caller){
+        var option = $('#toolOptions');
+        option.append("<div id='toolContainer'></div>");
+        var optionDiv = $('#toolContainer');
+        var tool;
+        switch(caller){
+            case "pencil":
+                pencilAdd(optionDiv,caller);
+                break;
+            case "circle":
+                circleAdd(optionDiv,caller);
+                break;
+
+            case "rectangle":
+                rectangleAdd(optionDiv,caller);
+                break;
+            case "line":
+                lineAdd(optionDiv,caller); 
+                break;
+            case "brush":
+                brushAdd(optionDiv,caller);
                 break;
 
         }
@@ -790,11 +879,6 @@ $('document').ready(function(){
         $('#opacityVal').text('opacity '+$(this).val());
         ctx.globalAlpha = $(this).val();
     });
-    // Linewidth change
-    $('#lineWidth').on('change',function(){
-        var lineWidth = parseInt($(this).val());
-        changeLineWidth(lineWidth);
-    });
 
     $('#lineWidth').on('focusin',function(){
         inputOptions = true;
@@ -907,12 +991,40 @@ $('document').ready(function(){
     
     // Update Pen Size 
     function updatePenSize(size){
-        penSize  = size;
-        $('#pSize').text('pensize : '+penSize);
-        $('#pColor').css({width:penSize,height:penSize});
+        size = parseInt(size);
+        if(size>1){
+            penSize  = size;
+            $('#pSize').text('pensize : '+penSize);
+            $('#penSize').val(penSize);
+            $('#pColor').css({width:penSize,height:penSize});
+        }
     }
 
+    function updateRadius(r){
+        r = parseInt(r);
+        if(r>0){
+            radius = r;
+            $('#radius').val(r);
+            $('#rSize').text('radius : '+ r);
+            $('#pColor').css({width: r,height: r});
+        }
+    }
     
+    function updateRect(){
+        if(rWidth>0){
+            $('#width').val(rWidth);
+            $('#wi').text('width : '+rWidth);
+        }
+        if(rHeight>0){
+            $('#height').val(rHeight);
+            $('#hi').text('height : '+rHeight);
+        }
+    }
+
+    function updateLineWidth(){
+        
+    }
+
     // Change Color
     function colorChange(color){
         ctx.fillStyle = color;
@@ -1033,21 +1145,28 @@ $('document').ready(function(){
     socket.on('shapeEmit', function(data){
         colorChange(data.color);
         var change;
+        var prevLw = ctx.lineWidth;
         switch(data.type[0]){
             case 'c':
                 if('c' === data.type){
                     drawCircle(data.centerX,data.centerY,data.radius);
                 }else{
                     switch(data.type){
-                        case 'cd': 
+                        case 'cd':
+                                ctx.lineWidth = data.lw;
                                 clearCircle(data.centerX,data.centerY,data.radius);
                                 drawCircle(data.centerX,data.centerY,data.radius);
+                                ctx.lineWidth = prevLw;
                            break;
                         case 'cco':
+                                ctx.lineWidth = data.lw;
                                 drawCircle(data.centerX,data.centerY,data.radius);
+                                ctx.lineWidth = prevLw;
                           break;
                         case 'ct': 
+                                ctx.lineWidth = data.lw;
                                 drawCircle(data.centerX,data.centerY,data.radius);
+                                ctx.lineWidth = prevLw;
                          break; 
                     }
                 }

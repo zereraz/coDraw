@@ -2,7 +2,7 @@ extends index
 block content 
         div(id="options")
                 button(id="clearCanvas",title="Clear Canvas")
-                    img(src="/img/t_clear.png")
+                    img(src="/img/t_clear2.png")
                 button(id="textTool",title="Text [t]",data-tool="text")
                     img(src="/img/t_text.png")
                 button(id="brush",title="Brush [3]",data-tool="brush")
@@ -14,9 +14,9 @@ block content
                 button(id="circleTool",title="Circle [c]",data-tool="circle")
                     img(src="/img/t_circle.png")
                 button(id="lineTool",title="Line []",data-tool="line")
-                    p line
-                button(id="rectangleTool",title="Rectangle []",data-tool="rectangle")
-                    p rectangle
+                    img(src="/img/t_line.png")
+                button(id="rectangleTool",title="Rectangle [r]",data-tool="rectangle")
+                    img(src="/img/t_rectangle.png")
                 a(id="downloadCanvasLink")
                     button(id="downloadCanvas")
                         img(src="/img/t_download.png")
@@ -30,7 +30,6 @@ block content
                 div(id="bgColor") 
                     p background color(hex) #
                         input(class="color{pickerFaceColor:'transparent',pickerFace:3,pickerBorder:0,pickerInsetColor:'black'}", value="ffffff", id="bgColorInp") 
-                input(id='lineWidth',class='optionInput',placeholder='   line width')
                 p(id="opacityVal") opacity 1
                 input(id="opacity", min="0", max="1", type="range",step="0.1",value="1")
 
@@ -39,27 +38,6 @@ block content
         canvas(id="canvas")
             Your browser does not support canvas element.
         div(id="toolOptions")
-            p tool : pen [1]
-        div(id="info")
-            h2 Info
-            h3 + 
-            span key to Increase pensize
-            br
-            h3 - 
-            span key to Increase pensize
-            br
-            h3 1 
-            span key for pen
-            br
-            h3 2 
-            span key for eraser
-            br
-            h3 enter &nbsp
-            span to enter/escape full screen
-            br
-            h3 c 
-            span for circles   
-            br
         div(id="status") 
         div(id="chatWindow")
             h4 chat window
@@ -91,8 +69,6 @@ block content
                     img(src="/img/t_download.png")
             div(id="penSz")
                 h3(id="pSize") 5
-                button(id="inc") + [+]
-                button(id="dec") - [-]
             button
                 div(id="pColor") 
             div(id="penColor") 
@@ -103,33 +79,10 @@ block content
             div(id="bgColor") 
                 p background color(hex) #
                     input(class="color{pickerFaceColor:'transparent',pickerFace:3,pickerBorder:0,pickerInsetColor:'black'}", value="ffffff", id="bgColorInp") 
-            input(id='lineWidth',class='optionInput',placeholder='   line width')
     canvas(id="canvasBg", width="500", height="500")
     canvas(id="canvas", width="500", height="500")
     button(id="fullScreen") Full Screen
     div(id="toolOptions")
-        div(id="toolContainer")
-        p tool : pen [1]
-    div(id="info")
-        h2 Info
-        h3 + 
-        span key to Increase pensize
-        br
-        h3 - 
-        span key to Increase pensize
-        br
-        h3 1 
-        span key for pen
-        br
-        h3 2 
-        span key for eraser
-        br
-        h3 enter &nbsp
-        span to enter/escape full screen
-        br
-        h3 c 
-        span for circles   
-        br
     div(id="status") 
     div(id="chatWindow")
         h4 chat window

@@ -36,7 +36,7 @@ exports.userCheck = function(req,res){
         if(roomLord[room].userList.indexOf(user)!==-1){
             res.send('-1');
         }else{
-            res.send('1');
+            res.send('0');
         }
     }else{
         res.send('1');
