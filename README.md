@@ -23,6 +23,14 @@ it uses socket.io
                 - default
                 - cone
                 - target
+            - Rectangle
+                - default
+                - RectCone
+            - Line
+                - default
+                - lineCone
+        - Brush
+            - Simple
  - Pen Size
  - Full Screen mode
  - Color Picker
@@ -32,6 +40,7 @@ it uses socket.io
  - Download Image drawn
  - Shortcut Keys
  - Group chat available
+ - Opacity control 
 
 ### Install
 
@@ -39,4 +48,8 @@ it uses socket.io
 
 ### current location (testing)
 
-illustrations.herokuapp.com
+[illustrations](illustrations.herokuapp.com)
+
+### officially
+
+[codraw](https://codraw.io)
