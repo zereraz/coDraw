@@ -53,6 +53,8 @@ $('document').ready(function(){
     var currentTool = 'pen';
     var eraser = false;
     var text = false;
+    var fontSize = 10;
+    var font = "Arial";
     var myString = "";
     // undo
     var undo = []; 
@@ -310,7 +312,7 @@ $('document').ready(function(){
         var change;
         var changeX,changeY;
         colorChange(penColor);
-		if(!text && !shape){
+		if(!text && !shape && !brush){
             if(!moving){ 
                     drawClick(currentX,currentY,penSize);
                     justClickEmit();
@@ -319,8 +321,7 @@ $('document').ready(function(){
                     dragDrawEmit();
                 }
             }else if(text && !moving){
-                    var font = "Georgia";
-                    ctx.font=penSize+"px "+font; 
+                    ctx.font = fontSize+"px "+font; 
                     myString = prompt("Enter text");
                     if(myString){
                         ctx.fillText(myString,currentX,currentY);
@@ -335,7 +336,7 @@ $('document').ready(function(){
                         };
                         socket.emit('text', textDetails);
                     } 
-            }else if(shape && !moving){
+            }else if(shape && !moving || brush && !moving){
                 var circleData = {};
                 switch(type[0]){
                     //if circle
@@ -360,6 +361,7 @@ $('document').ready(function(){
                         y = currentY;
                         drawRectangle(x,y,rWidth,rHeight);
                         break;
+                        //if line
                     case 'l':
                         x = currentX;
                         y = currentY;
@@ -368,8 +370,28 @@ $('document').ready(function(){
                             drawLine(lpt[0].x,lpt[0].y,lpt[1].x,lpt[1].y);
                             lpt = [];
                         } 
+                        break;
+                        // if brush
+                    case 'b':
+                        switch(type){
+                            case 'bs':
+                                drawClick(currentX,currentY,ctx.lineWidth);
+                                justClickEmit();
+                            break;
+                            case 'bf':
+                                var img = new Image();
+                                img.src = '/img/b_furr.png';
+                                x = currentX;
+                                y = currentY;
+                                ctx.drawImage(img, x, y, ctx.lineWidth, ctx.lineWidth);
+                            break;
+
+                                
+                    }
+                        break;
+
                 }
-            }else if(shape && moving){
+            }else if(shape && moving || brush && moving){
                 switch(type){
                     case 'cco': 
                         change = currentX - prevX;
@@ -478,6 +500,17 @@ $('document').ready(function(){
                         if(lpt.length == 1){
                            drawLine(lpt[0].x,lpt[0].y,currentX,currentY); 
                         }
+                        break;
+                    case 'bs':
+                        drawDrag(prevX,prevY,currentX,currentY,penSize);
+                        dragDrawEmit();
+                        break;
+                    case 'bf':
+                        var currP = {x : currentX,y : currentY};
+                        var prevP = {x : prevX,y : prevY};
+                        var img = new Image();
+                        img.src = '/img/b_furr.png';
+                        furBrush(currP,prevP,img); 
                         break;
                 }
             }
@@ -596,9 +629,7 @@ $('document').ready(function(){
             if(extra){
                 currentTool = extra;       
             }
-        }
-        $('#toolOptions p').text('tool : '+currentTool);
-    
+        } 
     }
 
     // Refactor all html to different variables and just add them
@@ -652,7 +683,7 @@ $('document').ready(function(){
     }
     function lineAdd(optionDiv,caller){
 
-          var tool = "<div class='tool'><p>tool : line</p><select id="+caller+"><option>default</option><option>lineCone</option></select></div>";
+          var tool = "<div class='tool'><p>tool : line</p><select id="+caller+"><option>default</option><option>lineCone</option></select><input id='connected' type='checkbox' value='false' />Connected</div>";
                 optionDiv.append(tool);
                 lineWidthAdd(optionDiv,caller);
                 $('#'+caller).on('change',function(){
@@ -666,6 +697,14 @@ $('document').ready(function(){
                             break;
 
                     }
+                });
+                $('#connected').on('change', function(){
+                    if($(this).val() === 'false'){
+                        $(this).attr('value','true');
+                    }else{                        
+                        $(this).attr('value','false');
+                    }
+
                 });
     }
     // Refactor, create a function that creates an input range
@@ -698,18 +737,34 @@ $('document').ready(function(){
                 break;
                 case 'brush':
                     type = 'rb';
+                break;
 
             }
         });
     }
 
     function brushAdd(optionDiv, caller){
-        var tool = "<div class='tool'><select><option>simple</option></select></div>";
-        
+        var tool = "<div class='tool'><select id="+caller+"><option>simple</option><option>fur</option></select></div>";
         optionDiv.append(tool);
         lineWidthAdd(optionDiv,caller);
-
+        type = 'bs';
+        $('#'+caller).on('change',function(){
+            var selected = $(this).val();
+            switch(selected){
+                case "simple":
+                    type = 'bs';
+                break;
+                case "fur":
+                    type = 'bf';
+                break;
+            }
+        });
     }
+    
+    // Text ADD
+    // font,size
+
+
 
    function addToOptions(caller){
         var option = $('#toolOptions');
@@ -732,6 +787,9 @@ $('document').ready(function(){
                 break;
             case "brush":
                 brushAdd(optionDiv,caller);
+                break;
+            case "text":
+                textAdd(optionDiv,caller);
                 break;
 
         }
@@ -868,7 +926,7 @@ $('document').ready(function(){
     $('#pen').on('click', penOn);
 
     // click on Brush
-    $('#brush').on('click',brushOn);
+    $('#brushTool').on('click',brushOn);
     // Clear Canvas
     $('#clearCanvas').on('click', function(){
         ctx.clearRect(0,0,canvas.width,canvas.height); 
@@ -1192,5 +1250,34 @@ $('document').ready(function(){
       socket.emit('join', myStatus); 
     });
 
+
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ * 
+ *
+ * Brush Functions
+ *
+ *
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+// fur
+
+function distanceBetween(point1, point2) {
+  return Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
+}
+function angleBetween(point1, point2) {
+  return Math.atan2( point2.x - point1.x, point2.y - point1.y );
+}
+
+function furBrush(currP, prevP,img){
+    var distance = distanceBetween(prevP, currP);
+    var angle = angleBetween(prevP, currP);
+
+    for (var i = 0; i < distance; i++) {
+        x = prevP.x + (Math.sin(angle) * i) - 25;
+        y = prevP.y + (Math.cos(angle) * i) - 25;
+        ctx.drawImage(img, x, y, ctx.lineWidth, ctx.lineWidth);
+
+    }
+}
 
 });
