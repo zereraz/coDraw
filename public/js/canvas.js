@@ -36,6 +36,8 @@ $('document').ready(function(){
 	var moving = false;
     var isFullScreen = false;
     var shape = false;
+    // to fill shape brushes
+    var fill = false;
     var brush = false;
     // circle on click
     var x,y;    
@@ -121,6 +123,9 @@ $('document').ready(function(){
             }
             if(e.which == 108 || e.keyCode == 108){
                 lineOn();
+            }
+            if(e.which == 98 || e.keyCode == 98){
+                brushOn();
             }
         });
 
@@ -512,6 +517,13 @@ $('document').ready(function(){
                         img.src = '/img/b_furr.png';
                         furBrush(currP,prevP,img); 
                         break;
+                    case 'brf':
+                        var currP = {x : currentX,y : currentY};
+                        var prevP = {x : prevX,y : prevY};
+                        var img = new Image();
+                        img.src = '/img/b_furr.png';
+                        furRotateBrush(currP,prevP,img); 
+                        break;
                 }
             }
     }
@@ -656,7 +668,7 @@ $('document').ready(function(){
     }
     function circleAdd(optionDiv,caller){ 
 
-        var tool = "<div class='tool'><p id='rSize'>radius : 1</p><input id='radius' min='1' max='300' type='range'step='1'value='1'><select id="+caller+"><option>default</option><option>cone</option><option>target</option><option>brush</option></select></div>";
+        var tool = "<div class='tool'><p id='rSize'>radius : 1</p><input id='radius' min='1' max='300' type='range'step='1'value='1'><select id="+caller+"><option>default</option><option>cone</option><option>target</option><option>brush</option></select><input id='connected' type='checkbox' value='false' />fill</div>";
                 optionDiv.append(tool);
                 lineWidthAdd(optionDiv,caller);
                 $('#radius').on('change',function(){
@@ -679,6 +691,15 @@ $('document').ready(function(){
                             break;
 
                     }
+                });
+                $('#connected').on('change', function(){
+                    if($(this).val() === 'false'){
+                        $(this).attr('value','true');
+                        fill
+                    }else{                        
+                        $(this).attr('value','false');
+                    }
+
                 });
     }
     function lineAdd(optionDiv,caller){
@@ -744,7 +765,7 @@ $('document').ready(function(){
     }
 
     function brushAdd(optionDiv, caller){
-        var tool = "<div class='tool'><select id="+caller+"><option>simple</option><option>fur</option></select></div>";
+        var tool = "<div class='tool'><select id="+caller+"><option>simple</option><option>fur</option><option>rotating fur</option></select></div>";
         optionDiv.append(tool);
         lineWidthAdd(optionDiv,caller);
         type = 'bs';
@@ -757,6 +778,9 @@ $('document').ready(function(){
                 case "fur":
                     type = 'bf';
                 break;
+                case "rotating fur":
+                    type = 'brf';
+                    break;
             }
         });
     }
@@ -1259,13 +1283,16 @@ $('document').ready(function(){
  *
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-// fur
-
+// fur && fur rotate
 function distanceBetween(point1, point2) {
   return Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
 }
+
 function angleBetween(point1, point2) {
   return Math.atan2( point2.x - point1.x, point2.y - point1.y );
+}
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function furBrush(currP, prevP,img){
@@ -1278,6 +1305,23 @@ function furBrush(currP, prevP,img){
         ctx.drawImage(img, x, y, ctx.lineWidth, ctx.lineWidth);
 
     }
+
+}
+
+function furRotateBrush(currP, prevP,img){
+    var dist = distanceBetween(prevP, currP);
+    var angle = angleBetween(prevP, currP);
+
+    for (var i = 0; i < dist; i++) {
+        x = prevP.x + (Math.sin(angle) * i);
+        y = prevP.y + (Math.cos(angle) * i);
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(0.5, 0.5);
+        ctx.rotate(Math.PI * 180 / getRandomInt(0, 180));
+        ctx.drawImage(img, 0, 0);
+        ctx.restore();
+  }
 }
 
 });
