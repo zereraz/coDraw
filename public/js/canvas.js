@@ -178,6 +178,13 @@ $('document').ready(function(){
 		canvasBg.width = $(window).height();
 		canvasBg.height= $(window).width()*0.35;
         ctxBg = canvasBg.getContext('2d'); 
+
+        // temporary canvas        
+        canvasTemp = document.createElement('canvas');
+        canvasTemp.width = canvas.width;
+        canvasTemp.height = canvas.height;
+        ctxTemp = canvasTemp.getContext('2d');
+        //pattern to signify transparency
         drawPattern();
         width = canvas.width;
 		height = canvas.height;
@@ -916,13 +923,10 @@ $('document').ready(function(){
     }
 	
     function downloadImage(name,link){
-        canvasTemp = document.createElement('canvas');
-        ctxTemp = canvasTemp.getContext('2d');
         ctxTemp.drawImage(canvasBg,0,0);
         ctxTemp.drawImage(canvas,0,0);
         link.href = canvasTemp.toDataURL();
-        return link.download = name;
-
+        link.download = name;
     }
 
     function dragDrawEmit(){
@@ -1029,7 +1033,11 @@ $('document').ready(function(){
         if(name===null){
             return false;
         }
-        downloadImage(name,$(this));
+        ctxTemp.drawImage(canvasBg,0,0);
+        ctxTemp.drawImage(canvas,0,0);
+        this.href = canvasTemp.toDataURL();
+        this.download = name;
+//        downloadImage(name,$(this));
     });
 
 
