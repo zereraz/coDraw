@@ -18,6 +18,7 @@ var port = process.env.PORT || 3000;
 //routes
 var index = require('./routes/index');
 var room = require('./routes/room');
+var artbay = require('./routes/artbay');
 var activeConnections = 0;
 var myRoom = 0;
 var roomLord = {};
@@ -65,6 +66,8 @@ app.get('/',index.home);
 app.get('/room',room.gRoom);
 app.post('/room',room.pRoom);
 app.get('/usercheck',room.userCheck);
+app.get('/artbay',artbay.home)
+
 
 //port, to get port where heroku app is hosted
 app.get('/port',function(req,res){
@@ -154,7 +157,6 @@ io.on('connection', function(socket){
                 var users = roomData.userList;
                 for(var j = 0 ; j < users.length ; j++){
                     if(id == Object.keys(users[j])){ 
-                        console.log("user with id "+id+" disconnected");
                         room.deleteUser(users[j][id],keys[i]);
                         users.splice(j,1);
                         roomData.users -= 1;
@@ -163,7 +165,6 @@ io.on('connection', function(socket){
                 if(roomData.users===0){
                     room.deleteRoom(keys[i]);
                     delete roomLord[keys[i]];
-                    console.log("deleting room "+keys[i]);
                 }
             }
 

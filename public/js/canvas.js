@@ -96,6 +96,7 @@ $('document').ready(function(){
             // 1        
             if((e.which == 49 || e.keyCode == 49) && !inputOptions){
                 off();
+                penOn();
             }
             
             // t        
@@ -301,7 +302,7 @@ $('document').ready(function(){
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
         ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
-        ctx.fill();
+        ctx.stroke();
         ctx.restore(); 
     }
     function drawLine(x1,y1,x2,y2){
@@ -447,7 +448,8 @@ $('document').ready(function(){
                         if(radius<0){
                             radius = radius*(-1);
                         }
-                        clearCircle(x,y,radius+ctx.lineWidth/2);
+                        // fix later
+                        //clearCircle(x,y,radius+ctx.lineWidth/2);
                         drawCircle(x,y,radius);
                         
                         circleData = {
@@ -524,13 +526,29 @@ $('document').ready(function(){
                         img.src = '/img/b_furr.png';
                         furRotateBrush(currP,prevP,img); 
                         break;
+                    case 'bvw':
+                        var currP = {
+                            x:currentX,
+                            y:currentY,
+                            px:prevX,
+                            py:prevY,
+                    };
+                    variableWidthBrush(currP);
+                        break;
+                    case 'bsp':                        
+                        var currP = {
+                            x  : currentX,
+                            y  : currentY
+                        };
+                        sprayBrush(currP);
+
                 }
             }
     }
     function penOn(){
         off();
         updateCurrentTool($(this));
-        addToOptions(currentTool); 
+        addToOptions('pencil'); 
     }
     //off eraser text
     function off(){
@@ -544,6 +562,7 @@ $('document').ready(function(){
     function eraserOn(){
         off();
         updateCurrentTool($(this));
+        addToOptions('eraser');
         eraser = true; 
         prevPenColor = penColor;
         penColor = "rgb(0,0,0,1)"; 
@@ -666,6 +685,13 @@ $('document').ready(function(){
             updatePenSize($(this).val());
         });
     }
+     function eraserAdd(optionDiv,caller){
+        var tool = '<div class="tool"><p id="pSize">eraser size : 1</p><input id="penSize" min="1" max="200" type="range"step="1"value="1"><p>tool : eraser</p></div>';               
+        optionDiv.append(tool);
+        $('#penSize').on('change',function(){
+            updatePenSize($(this).val());
+        });
+    }
     function circleAdd(optionDiv,caller){ 
 
         var tool = "<div class='tool'><p id='rSize'>radius : 1</p><input id='radius' min='1' max='300' type='range'step='1'value='1'><select id="+caller+"><option>default</option><option>cone</option><option>target</option><option>brush</option></select><input id='connected' type='checkbox' value='false' />fill</div>";
@@ -765,7 +791,7 @@ $('document').ready(function(){
     }
 
     function brushAdd(optionDiv, caller){
-        var tool = "<div class='tool'><select id="+caller+"><option>simple</option><option>fur</option><option>rotating fur</option></select></div>";
+        var tool = "<div class='tool'><select id="+caller+"><option>simple</option><option>fur</option><option>rotating fur</option><option>variable width</option></select></div>";
         optionDiv.append(tool);
         lineWidthAdd(optionDiv,caller);
         type = 'bs';
@@ -780,6 +806,9 @@ $('document').ready(function(){
                 break;
                 case "rotating fur":
                     type = 'brf';
+                    break;
+                case "variable width":
+                    type = 'bvw';
                     break;
             }
         });
@@ -815,8 +844,11 @@ $('document').ready(function(){
             case "text":
                 textAdd(optionDiv,caller);
                 break;
+            case "eraser":
+                eraserAdd(optionDiv, caller);
 
         }
+        
                 
     }
     function bg(){  
@@ -1319,9 +1351,27 @@ function furRotateBrush(currP, prevP,img){
         ctx.translate(x, y);
         ctx.scale(0.5, 0.5);
         ctx.rotate(Math.PI * 180 / getRandomInt(0, 180));
-        ctx.drawImage(img, 0, 0);
+        ctx.drawImage(img, 0, 0, ctx.lineWidth, ctx.lineWidth);
         ctx.restore();
   }
+}
+
+
+// Not working properly
+// currP px,py(previous),x,y,randomWidth
+function variableWidthBrush(currP){
+    ctx.beginPath();
+    ctx.moveTo(currP.px, currP.py);
+    ctx.lineWidth = getRandomInt(ctx.lineWidth-1,ctx.lineWidth+1);
+    console.log(ctx.lineWidth);
+    ctx.lineTo(currP.x, currP.y);
+    ctx.stroke();
+
+}
+
+function sprayBrush(currP){
+    var radius = ctx.lineWidth;
+
 }
 
 });
