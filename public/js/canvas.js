@@ -681,7 +681,7 @@ $('document').ready(function(){
         var lineWidth = 1;
         $('#lineW').text('lineWidth : '+lineWidth);
         
-        $('#lineWidth').on('change input mousemove',function(){
+        $('#lineWidth').on('change input',function(){
             lineWidth = $(this).val();
             changeLineWidth(lineWidth);
         });
@@ -690,14 +690,14 @@ $('document').ready(function(){
     function pencilAdd(optionDiv,caller){
         var tool = '<div class="tool"><p id="pSize">pensize : 1</p><input id="penSize" min="1" max="200" type="range"step="1"value="1"><p>tool : pencil</p></div>';               
         optionDiv.append(tool);
-        $('#penSize').on('change input mousemove',function(){
+        $('#penSize').on('change input',function(){
             updatePenSize($(this).val());
         });
     }
      function eraserAdd(optionDiv,caller){
         var tool = '<div class="tool"><p id="pSize">eraser size : 1</p><input id="penSize" min="1" max="200" type="range"step="1"value="1"><p>tool : eraser</p></div>';               
         optionDiv.append(tool);
-        $('#penSize').on('change input mousemove',function(){
+        $('#penSize').on('change input',function(){
             updatePenSize($(this).val());
         });
     }
@@ -706,10 +706,10 @@ $('document').ready(function(){
         var tool = "<div class='tool'><p id='rSize'>radius : 1</p><input id='radius' min='1' max='300' type='range'step='1'value='1'><select id="+caller+"><option>default</option><option>cone</option><option>target</option><option>brush</option></select><input id='connected' type='checkbox' value='false' />fill</div>";
                 optionDiv.append(tool);
                 lineWidthAdd(optionDiv,caller);
-                $('#radius').on('change input mousemove',function(){
+                $('#radius').on('change input',function(){
                     updateRadius($(this).val());
                 });
-                $('#'+caller).on('change input mousemove',function(){
+                $('#'+caller).on('change input',function(){
                     var selected = $(this).val();
                     switch(selected){
                         case "cone":
@@ -772,12 +772,12 @@ $('document').ready(function(){
 
         optionDiv.append(tool);
         lineWidthAdd(optionDiv,caller);
-        $('#width').on('change input mousemove',function(){
+        $('#width').on('change input',function(){
             rWidth = parseInt($(this).val());
             updateRect();
         });
 
-        $('#height').on('change input mousemove',function(){
+        $('#height').on('change input',function(){
             rHeight = parseInt($(this).val());
             updateRect();
         });
