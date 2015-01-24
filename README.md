@@ -3,16 +3,7 @@
 coDraw is a collaborative drawing canvas
 it uses socket.io
 
-### Todo
- - ~~A basic layout~~
- - ~~Basic socket setup~~
- - ~~Working canvas~~
- - ~~Draw on canvas~~ 
- - ~~update client side of sockets~~
- - ~~Talk with android app(send messages back and forth)~~
- - Brush Library
- - ~~Remake the create room/ join room and emulate the lasquare method~~
- - ### Feautres
+### Feautres
     - Realtime Drawing
     - Various tools like
         - Pen
@@ -31,6 +22,9 @@ it uses socket.io
                 - lineCone
         - Brush
             - Simple
+            - Fur
+            - Rotating fur
+            - Variable width
  - Pen Size
  - Full Screen mode
  - Color Picker
@@ -43,8 +37,9 @@ it uses socket.io
  - Opacity control 
 
 ### Install
-
- `npm install` 
+ - Clone the repo
+ - cd into it
+ - `npm install` 
 
 ### current location (testing)
 

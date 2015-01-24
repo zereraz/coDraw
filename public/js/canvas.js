@@ -180,10 +180,14 @@ $('document').ready(function(){
         ctxBg = canvasBg.getContext('2d'); 
 
         // temporary canvas        
-        canvasTemp = document.createElement('canvas');
+        canvasTemp = document.createElement('canvas'); 
         canvasTemp.width = canvas.width;
         canvasTemp.height = canvas.height;
         ctxTemp = canvasTemp.getContext('2d');
+        canvasTemp.id = "canvasTemp";
+        $(canvasTemp).css('z-index',1);
+        var container = canvas.parentNode;
+        container.appendChild(canvasTemp);
         //pattern to signify transparency
         drawPattern();
         width = canvas.width;
@@ -296,6 +300,14 @@ $('document').ready(function(){
             ctx.arc(currentX,currentY,radius,0,Math.PI*2);
             ctx.stroke();
            
+    }
+    // on temporary canvas
+    function drawCircleTemp(currentX,currentY,radius){
+            $(canvasTemp).css('z-index',3);
+            ctxTemp.clearRect(0,0,canvasTemp.width,canvasTemp.height);
+            ctxTemp.beginPath();
+            ctxTemp.arc(currentX,currentY,radius,0,Math.PI*2);
+            ctxTemp.stroke();
     }
     // drawing rectangle
     function drawRectangle(currentX, currentY,width,height){
@@ -458,9 +470,14 @@ $('document').ready(function(){
                             radius = radius*(-1);
                         }
                         // fix later
-                        //clearCircle(x,y,radius+ctx.lineWidth/2);
-                        drawCircle(x,y,radius);
-                        
+                        if(ctx.lineWidth <5){
+                            clearCircle(x,y,radius+ctx.lineWidth);
+                        }else{
+                            clearCircle(x,y,radius+ctx.lineWidth/3);
+                        }
+                        //drawCircleTemp(x,y,radius);
+                        drawCircle(x,y,radius-ctx.lineWidth);
+
                         circleData = {
                             "type" : type,
                             "centerX" : x,
@@ -470,7 +487,7 @@ $('document').ready(function(){
                             "room" : myRoom,
                             "lw":ctx.lineWidth
                         };
-                        socket.emit('shape', circleData);
+                        //socket.emit('shape', circleData);
                         break;
                     case 'cb':
                         drawCircle(currentX,currentY,radius);
