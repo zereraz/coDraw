@@ -292,13 +292,14 @@ $('document').ready(function(){
 			ctx.closePath();
     }
    // drawing circle 
-    function drawCircle(currentX,currentY,radius){
-           /* var temp = ctx.lineWidth
-            ctx.lineWidth = 1;
-            */
-            ctx.beginPath();
-            ctx.arc(currentX,currentY,radius,0,Math.PI*2);
-            ctx.stroke();
+    function drawCircle(currentX,currentY,radius,fill){
+        ctx.beginPath();
+        ctx.arc(currentX,currentY,radius,0,Math.PI*2);
+        if(fill === 0){
+            ctx.stroke();        
+        }else{
+           ctx.fill();
+        }
            
     }
     // on temporary canvas
@@ -334,11 +335,29 @@ $('document').ready(function(){
         ctx.stroke();
     }
 
+
+
+    /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+     *
+     *
+     *  Helper functions
+     *
+     * %%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+    function getSituation(){
+    
+    }
+
     function drawStroke(){
         // circle change
         var change;
         var changeX,changeY;
+        var sFill = 0;
         colorChange(penColor);
+        var situation = getSituation();
+        switch(situation){
+        
+        };
 		if(!text && !shape && !brush){
             if(!moving){ 
                     drawClick(currentX,currentY,penSize);
@@ -351,7 +370,7 @@ $('document').ready(function(){
                     ctx.font = fontSize+"px "+font; 
                     myString = prompt("Enter text");
                     if(myString){
-                        ctx.fillText(myString,currentX,currentY);
+                        ctx.sFillText(myString,currentX,currentY);
                         var textDetails = {
                             "font":font,
                             "penSize":penSize,
@@ -368,9 +387,10 @@ $('document').ready(function(){
                 switch(type[0]){
                     //if circle
                     case 'c':
+
                         x = currentX;
                         y = currentY;
-                        drawCircle(x,y,radius); 
+                        drawCircle(x,y,radius,sFill); 
                         circleData = {
                             "type" : 'c',
                             "centerX" : x,
@@ -427,7 +447,7 @@ $('document').ready(function(){
                         if(radius<0){
                             radius = radius*(-1);
                         }
-                        drawCircle(currentX,currentY,radius);
+                        drawCircle(currentX,currentY,radius,sFill);
 
                         var circleData = {
                             "type" : type,
@@ -447,7 +467,7 @@ $('document').ready(function(){
                         if(radius<0){
                             radius = radius*(-1);
                         }
-                        drawCircle(x,y,radius);
+                        drawCircle(x,y,radius,sFill);
                         
                         circleData = {
                             "type" : type,
@@ -476,7 +496,7 @@ $('document').ready(function(){
                             clearCircle(x,y,radius+ctx.lineWidth/3);
                         }
                         //drawCircleTemp(x,y,radius);
-                        drawCircle(x,y,radius-ctx.lineWidth);
+                        drawCircle(x,y,radius-ctx.lineWidth,sFill);
 
                         circleData = {
                             "type" : type,
@@ -490,7 +510,7 @@ $('document').ready(function(){
                         //socket.emit('shape', circleData);
                         break;
                     case 'cb':
-                        drawCircle(currentX,currentY,radius);
+                        drawCircle(currentX,currentY,radius,sFill);
                         break;
                     // Rectangle cases
                     case 'rd':                        
@@ -545,7 +565,6 @@ $('document').ready(function(){
                         img.src = '/img/b_furr.png';
                         furBrush(currP,prevP,img); 
                         break;
-                    case 'brf':
                         var currP = {x : currentX,y : currentY};
                         var prevP = {x : prevX,y : prevY};
                         var img = new Image();
@@ -1399,7 +1418,6 @@ function variableWidthBrush(currP){
     ctx.beginPath();
     ctx.moveTo(currP.px, currP.py);
     ctx.lineWidth = getRandomInt(ctx.lineWidth-1,ctx.lineWidth+1);
-    console.log(ctx.lineWidth);
     ctx.lineTo(currP.x, currP.y);
     ctx.stroke();
 

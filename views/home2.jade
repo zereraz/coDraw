@@ -1,9 +1,23 @@
 extends index2
 block content
-    div(id="container")
-        div(id="error")
-            h3
-        form(method="POST",action="/room")
-            input(id="username",class="inp",name="uname",placeholder="  username")
-            input(id="room",class="inp",name='roomId',placeholder="  roomId")
-            input(id="crOrjo",type="submit",value="submit")
+    div(id="error")
+        h3
+    div(id="container",class="ui page grid")
+        div(class="ui stackable sixteen column grid")
+            div(class="four wide column")
+                img(src="/img/logo_font.png",class="ui medium image")
+            div(class="ten wide column")
+                div(class="ui stackable ten column grid")
+                    form(method="POST",action="/room")
+                    div(class="four wide column")
+                        div(class="ui icon input") 
+                            input(id="username",class="inp",name="uname",placeholder="  username")
+                            i(class="user icon")
+                    div(class="four wide column")
+                        div(class="ui icon input") 
+                            input(id="room",class="inp",name='roomId',placeholder="  roomId")
+                            i(class="paw icon")
+                    div(class="two wide column")
+                        div(id="sub",class="ui inverted orange button") Submit
+
+
